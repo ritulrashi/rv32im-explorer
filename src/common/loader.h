@@ -14,9 +14,9 @@
 #include <string>
 #include <vector>
 
-#include "iss/memory.h"
+#include "common/memory.h"
 
-namespace rvx::iss {
+namespace rvx {
 
 struct LoadError : std::runtime_error {
   using std::runtime_error::runtime_error;
@@ -42,4 +42,4 @@ LoadResult load_flat_file(const std::string& path, uint32_t base, Memory& mem);
 
 std::vector<uint8_t> read_file(const std::string& path);
 
-}  // namespace rvx::iss
+}  // namespace rvx

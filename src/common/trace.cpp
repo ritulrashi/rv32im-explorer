@@ -27,4 +27,20 @@ std::string format_retire(const RetireRecord& r) {
   return line;
 }
 
+std::string_view to_string(HaltReason r) {
+  switch (r) {
+    case HaltReason::None: return "running";
+    case HaltReason::ToHost: return "tohost";
+    case HaltReason::IllegalInsn: return "illegal-instruction";
+    case HaltReason::MisalignedFetch: return "misaligned-fetch";
+    case HaltReason::MisalignedLoad: return "misaligned-load";
+    case HaltReason::MisalignedStore: return "misaligned-store";
+    case HaltReason::Ecall: return "ecall";
+    case HaltReason::Ebreak: return "ebreak";
+    case HaltReason::MaxInsns: return "max-insns";
+    case HaltReason::MaxCycles: return "max-cycles";
+  }
+  return "?";
+}
+
 }  // namespace rvx

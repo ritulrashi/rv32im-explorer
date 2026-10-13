@@ -12,7 +12,7 @@
 #include <span>
 #include <unordered_map>
 
-namespace rvx::iss {
+namespace rvx {
 
 class Memory {
  public:
@@ -37,4 +37,4 @@ class Memory {
   std::unordered_map<uint32_t, std::unique_ptr<Page>> pages_;
 };
 
-}  // namespace rvx::iss
+}  // namespace rvx

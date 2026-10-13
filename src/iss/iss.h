@@ -9,24 +9,12 @@
 #include <optional>
 #include <string_view>
 
-#include "iss/memory.h"
+#include "common/memory.h"
 #include "common/retire.h"
 
 namespace rvx::iss {
 
-enum class HaltReason : uint8_t {
-  None,             // still running
-  ToHost,           // program stored to the tohost address (normal end)
-  IllegalInsn,
-  MisalignedFetch,  // jump/branch target not 4-byte aligned, or misaligned pc
-  MisalignedLoad,
-  MisalignedStore,
-  Ecall,
-  Ebreak,
-  MaxInsns,         // instruction budget exhausted (only set by run())
-};
-
-std::string_view to_string(HaltReason r);
+using rvx::HaltReason;
 
 struct RunResult {
   HaltReason reason = HaltReason::None;

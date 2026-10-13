@@ -1,10 +1,10 @@
-#include "iss/memory.h"
+#include "common/memory.h"
 
 #include <gtest/gtest.h>
 
 #include <vector>
 
-using rvx::iss::Memory;
+using rvx::Memory;
 
 TEST(Memory, UntouchedReadsZeroWithoutAllocating) {
   Memory m;

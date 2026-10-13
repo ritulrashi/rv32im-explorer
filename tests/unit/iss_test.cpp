@@ -16,7 +16,7 @@ using rvx::MemKind;
 using rvx::RetireRecord;
 using rvx::iss::HaltReason;
 using rvx::iss::Iss;
-using rvx::iss::Memory;
+using rvx::Memory;
 
 namespace {
 

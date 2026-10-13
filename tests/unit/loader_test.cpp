@@ -1,7 +1,7 @@
 // Loader tests. ELF images are built byte-by-byte here from the ELF32 spec
 // layout (System V gABI), so the test does not depend on the cross toolchain
 // or on the loader's own structure definitions.
-#include "iss/loader.h"
+#include "common/loader.h"
 
 #include <gtest/gtest.h>
 
@@ -11,8 +11,8 @@
 #include <string>
 #include <vector>
 
-using rvx::iss::LoadError;
-using rvx::iss::Memory;
+using rvx::LoadError;
+using rvx::Memory;
 
 namespace {
 
@@ -130,7 +130,7 @@ ElfBuilder typical() {
 TEST(ElfLoader, LoadsSegmentsEntryAndSymbols) {
   Memory mem;
   auto img = typical().build();
-  auto r = rvx::iss::load_elf(img, mem);
+  auto r = rvx::load_elf(img, mem);
   EXPECT_EQ(r.entry, 0x80000040u);
   EXPECT_EQ(mem.load(0x80000000, 4), 0x00000013u);
   EXPECT_EQ(mem.load(0x80000004, 4), 0x000000EFu);
@@ -145,7 +145,7 @@ TEST(ElfLoader, BssIsZeroFilledEvenOverExistingData) {
   Memory mem;
   for (uint32_t a = 0x80001000; a < 0x80001010; a += 4) mem.store(a, 4, 0xFFFFFFFF);
   auto img = typical().build();
-  rvx::iss::load_elf(img, mem);
+  rvx::load_elf(img, mem);
   for (uint32_t a = 0x80001004; a < 0x80001010; a += 4) EXPECT_EQ(mem.load(a, 4), 0u) << a;
   EXPECT_EQ(mem.load(0x80001010, 4), 0u);  // never written, still zero
 }
@@ -154,21 +154,21 @@ TEST(ElfLoader, RejectsBadMagic) {
   Memory mem;
   auto img = typical().build();
   img[1] = 'X';
-  EXPECT_THROW(rvx::iss::load_elf(img, mem), LoadError);
+  EXPECT_THROW(rvx::load_elf(img, mem), LoadError);
 }
 
 TEST(ElfLoader, RejectsElf64) {
   Memory mem;
   auto img = typical().build();
   img[4] = 2;
-  EXPECT_THROW(rvx::iss::load_elf(img, mem), LoadError);
+  EXPECT_THROW(rvx::load_elf(img, mem), LoadError);
 }
 
 TEST(ElfLoader, RejectsBigEndian) {
   Memory mem;
   auto img = typical().build();
   img[5] = 2;
-  EXPECT_THROW(rvx::iss::load_elf(img, mem), LoadError);
+  EXPECT_THROW(rvx::load_elf(img, mem), LoadError);
 }
 
 TEST(ElfLoader, RejectsNonRiscv) {
@@ -176,7 +176,7 @@ TEST(ElfLoader, RejectsNonRiscv) {
   auto img = typical().build();
   img[18] = 62;  // EM_X86_64
   img[19] = 0;
-  EXPECT_THROW(rvx::iss::load_elf(img, mem), LoadError);
+  EXPECT_THROW(rvx::load_elf(img, mem), LoadError);
 }
 
 TEST(ElfLoader, RejectsTruncatedFile) {
@@ -184,7 +184,7 @@ TEST(ElfLoader, RejectsTruncatedFile) {
   auto img = typical().build();
   for (size_t len : {size_t{0}, size_t{10}, size_t{52}, size_t{80}}) {
     std::vector<uint8_t> cut(img.begin(), img.begin() + static_cast<long>(len));
-    EXPECT_THROW(rvx::iss::load_elf(cut, mem), LoadError) << len;
+    EXPECT_THROW(rvx::load_elf(cut, mem), LoadError) << len;
   }
 }
 
@@ -192,14 +192,14 @@ TEST(ElfLoader, RejectsSegmentOutsideFile) {
   Memory mem;
   auto img = typical().build();
   ElfBuilder::put32(img, 52 + 4, 0xFFFFFFF0);  // p_offset of segment 0
-  EXPECT_THROW(rvx::iss::load_elf(img, mem), LoadError);
+  EXPECT_THROW(rvx::load_elf(img, mem), LoadError);
 }
 
 TEST(ElfLoader, RejectsFileszLargerThanMemsz) {
   Memory mem;
   auto b = typical();
   b.segs[0].memsz = 4;
-  EXPECT_THROW(rvx::iss::load_elf(b.build(), mem), LoadError);
+  EXPECT_THROW(rvx::load_elf(b.build(), mem), LoadError);
 }
 
 TEST(FlatLoader, LoadsWholeFileAtBase) {
@@ -210,7 +210,7 @@ TEST(FlatLoader, LoadsWholeFileAtBase) {
     os.write(bytes, sizeof bytes);
   }
   Memory mem;
-  auto r = rvx::iss::load_flat_file(path.string(), 0x1000, mem);
+  auto r = rvx::load_flat_file(path.string(), 0x1000, mem);
   EXPECT_EQ(r.entry, 0x1000u);
   EXPECT_EQ(mem.load(0x1000, 4), 0x13u);
   EXPECT_EQ(mem.load(0x1004, 4), 0x6Fu);
@@ -219,5 +219,5 @@ TEST(FlatLoader, LoadsWholeFileAtBase) {
 
 TEST(FileLoad, MissingFileThrows) {
   Memory mem;
-  EXPECT_THROW(rvx::iss::load_elf_file("/nonexistent/definitely_not_here.elf", mem), LoadError);
+  EXPECT_THROW(rvx::load_elf_file("/nonexistent/definitely_not_here.elf", mem), LoadError);
 }

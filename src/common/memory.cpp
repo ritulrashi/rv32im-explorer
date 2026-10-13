@@ -1,8 +1,8 @@
-#include "iss/memory.h"
+#include "common/memory.h"
 
 #include <cassert>
 
-namespace rvx::iss {
+namespace rvx {
 
 uint8_t Memory::load8(uint32_t addr) const {
   auto it = pages_.find(addr >> kPageBits);
@@ -34,4 +34,4 @@ void Memory::write_block(uint32_t addr, std::span<const uint8_t> bytes) {
   for (size_t k = 0; k < bytes.size(); ++k) store8(addr + static_cast<uint32_t>(k), bytes[k]);
 }
 
-}  // namespace rvx::iss
+}  // namespace rvx

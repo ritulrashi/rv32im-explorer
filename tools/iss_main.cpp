@@ -18,7 +18,7 @@
 #include <string>
 
 #include "iss/iss.h"
-#include "iss/loader.h"
+#include "common/loader.h"
 #include "common/trace.h"
 
 namespace {
@@ -143,7 +143,8 @@ int main(int argc, char** argv) {
     case HaltReason::MisalignedStore: code = 3; break;
     case HaltReason::Ecall:
     case HaltReason::Ebreak: code = 4; break;
-    case HaltReason::MaxInsns: code = 5; break;
+    case HaltReason::MaxInsns:
+    case HaltReason::MaxCycles: code = 5; break;
     case HaltReason::None: break;
   }
   std::fprintf(stderr, "rvsim-iss: %s halt=%s retired=%llu pc=0x%08x", verdict,

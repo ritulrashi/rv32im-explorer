@@ -1,9 +1,9 @@
-#include "iss/loader.h"
+#include "common/loader.h"
 
 #include <fstream>
 #include <iterator>
 
-namespace rvx::iss {
+namespace rvx {
 namespace {
 
 // ELF32 constants (System V gABI). Only what we use.
@@ -155,4 +155,4 @@ LoadResult load_flat_file(const std::string& path, uint32_t base, Memory& mem) {
   return out;
 }
 
-}  // namespace rvx::iss
+}  // namespace rvx

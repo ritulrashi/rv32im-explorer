@@ -6,8 +6,26 @@
 #pragma once
 
 #include <cstdint>
+#include <string_view>
 
 namespace rvx {
+
+// Why a run ended. Part of the comparison contract: lockstep requires both
+// models to stop for the same reason, at the same point.
+enum class HaltReason : uint8_t {
+  None,             // still running
+  ToHost,           // program stored to the tohost address (normal end)
+  IllegalInsn,
+  MisalignedFetch,  // jump/branch target not 4-byte aligned, or misaligned pc
+  MisalignedLoad,
+  MisalignedStore,
+  Ecall,
+  Ebreak,
+  MaxInsns,         // ISS instruction budget exhausted
+  MaxCycles,        // pipeline cycle budget exhausted
+};
+
+std::string_view to_string(HaltReason r);
 
 enum class MemKind : uint8_t { None, Read, Write };
 
