@@ -1,0 +1,42 @@
+cmake_minimum_required(VERSION 3.24)
+project(rv32im_explorer LANGUAGES CXX)
+
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+option(RVX_SANITIZE "Build with AddressSanitizer + UndefinedBehaviorSanitizer" OFF)
+option(RVX_BUILD_TESTS "Build unit tests and riscv-tests" ON)
+
+if(RVX_SANITIZE)
+  # -fno-sanitize-recover makes any UBSan finding abort the process, so a
+  # sanitizer report always turns into a test failure instead of a log line.
+  add_compile_options(-fsanitize=address,undefined -fno-sanitize-recover=all -fno-omit-frame-pointer)
+  add_link_options(-fsanitize=address,undefined)
+endif()
+
+# Strict warnings for project code only (not third-party targets).
+set(RVX_WARNINGS -Wall -Wextra -Wpedantic -Wshadow -Werror)
+
+add_library(rvx_common STATIC src/common/decode.cpp)
+target_include_directories(rvx_common PUBLIC src)
+target_compile_options(rvx_common PRIVATE ${RVX_WARNINGS})
+
+add_library(rvx_iss STATIC
+  src/iss/memory.cpp
+  src/iss/iss.cpp
+  src/iss/loader.cpp
+  src/iss/trace.cpp)
+target_include_directories(rvx_iss PUBLIC src)
+target_link_libraries(rvx_iss PUBLIC rvx_common)
+target_compile_options(rvx_iss PRIVATE ${RVX_WARNINGS})
+
+add_executable(rvsim-iss tools/iss_main.cpp)
+target_link_libraries(rvsim-iss PRIVATE rvx_iss)
+target_compile_options(rvsim-iss PRIVATE ${RVX_WARNINGS})
+
+if(RVX_BUILD_TESTS)
+  enable_testing()
+  add_subdirectory(tests)
+endif()

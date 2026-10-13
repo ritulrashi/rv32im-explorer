@@ -1,6 +1,6 @@
 # Phase 1 Design Note — Golden Functional Simulator (ISS)
 
-Status: **awaiting review**
+Status: **approved 2026-10-13; implemented**
 
 ## Purpose
 
@@ -138,6 +138,19 @@ important correctness case for the Phase 2 pipeline.
 | Sparse paged memory | flat array | load ELFs at any address without huge allocations |
 | Hand-written ELF32 parser (PT_LOAD + symtab) | libelf / ELFIO | no dependency; ~100 lines I can explain line by line |
 | Decode to an enum, then execute | execute directly on raw bits | the decode table is the thing Phase 2 is allowed to share |
+
+## Deviations from this note during implementation
+
+- CLI: no `--entry` flag (a flat binary's entry is `--base`). Added `--tohost ADDR`
+  so flat binaries can still signal pass/fail.
+- Cross-compile flags are `-march=rv32im_zifencei` (GCC 13 needs Zifencei for
+  `fence.i`). **Zicsr is deliberately omitted** so any CSR instruction fails
+  to assemble rather than silently depending on unmodelled behaviour.
+- Warnings are stricter than stated: `-Wall -Wextra -Wpedantic -Wshadow -Werror`.
+- Tests were written before the implementation, but were not run red against
+  stubs first. The harness's ability to fail was checked separately by
+  mutation (see `results/phase1/mutation_check.txt`).
+- Added a `trace-determinism` CTest: two traced runs must be byte-identical.
 
 ## Environment
 
