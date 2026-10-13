@@ -2,6 +2,9 @@
   "name": "rv32im-explorer",
   "image": "mcr.microsoft.com/devcontainers/base:ubuntu-24.04",
   "hostRequirements": { "cpus": 4 },
+  "features": {
+    "ghcr.io/devcontainers/features/sshd:1": { "version": "latest" }
+  },
   "postCreateCommand": "bash .devcontainer/setup.sh",
   "customizations": {
     "vscode": {
