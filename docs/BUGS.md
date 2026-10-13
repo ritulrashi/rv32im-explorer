@@ -6,6 +6,8 @@ Every bug found and fixed, with how it was detected.
 |---|---|---|---|---|---|---|
 | 1 | 1 | `tests/riscv-tests-env/riscv_test.h` (our custom test env) | `rv32ui-fence_i` halted with `illegal-instruction` at pc `0x80000178` after 56 retired instructions | Our `RVTEST_FAIL` macro added a spin loop labelled `2:`. `fence_i.S` uses the forward reference `2f` to mean its own `2:` label in `.data`; the assembler bound it to our earlier label in `.text.init` instead. The self-modifying stores therefore overwrote our spin loop, and the jump to "2f" landed on a corrupted word. | First full `ctest --preset asan` run (48/49 riscv-tests passing). The retire trace showed the stores at seq 49/51 targeting `0x80000178` (`.text.init`) instead of `0x800020xx` (`.data`). | see git log: "Phase 1: golden RV32IM ISS" |
 
+| 2 | 1 | `scripts/phase1_exit.sh`, `scripts/phase1_mutation_check.sh` (result provenance) | The first official run on a clean checkout of `cc3da27` reported `tree: DIRTY` | Both scripts piped their output through `tee results/phase1/...`. `tee` creates its output file as soon as the pipeline starts, so `env_report.sh`, running inside that same pipeline, saw an untracked `results/` directory. The measured code really was `cc3da27`, but the label was wrong. | Reading the generated results file before publishing it. The provenance block contradicted `git status`, which had been clean immediately before the run. | see git log: "Fix result provenance" |
+
 ## Notes on bug #1
 
 - Fix: spin loops in `RVTEST_PASS`/`RVTEST_FAIL` now use `j .` (no label). The env now defines no numeric labels beyond upstream's single `1:` in `RVTEST_FAIL`. A comment in the header warns about this.
