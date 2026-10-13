@@ -1,0 +1,41 @@
+# Phase 1 mutation check: does the riscv-tests harness detect injected ISS bugs?
+command: scripts/phase1_mutation_check.sh
+
+## Provenance (of the unmutated tree the mutants were derived from)
+date_utc: 2026-10-13T23:30:32Z
+commit: db43bce1210911c191c1f589b3b6de0769995baf
+tree: clean
+riscv-tests: 7b68f7b91f827f8d94cc1c57ff123752c5c8f704
+host: Linux 6.8.0-1064-azure x86_64
+os: Ubuntu 24.04.3 LTS
+lscpu:
+  Architecture:                            x86_64
+  CPU(s):                                  4
+  Model name:                              AMD EPYC 7763 64-Core Processor
+  Thread(s) per core:                      2
+  Core(s) per socket:                      2
+  Socket(s):                               1
+  L1d cache:                               64 KiB (2 instances)
+  L1i cache:                               64 KiB (2 instances)
+  L2 cache:                                1 MiB (2 instances)
+  L3 cache:                                32 MiB (1 instance)
+mem_total: 16377436 kB
+tools:
+  c++: c++ (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0
+  cmake: cmake version 3.28.3
+  ninja: 1.11.1
+  riscv-gcc: riscv64-unknown-elf-gcc (13.2.0-11ubuntu1+12) 13.2.0
+  riscv-binutils: GNU assembler (2.42-1ubuntu1+6) 2.42
+
+## Injected mutations
+117:    case Op::SRAI: writes_rd = true; result = a >> imm; break;  // MUTANT M2
+126:    case Op::SRA: writes_rd = true; result = a >> (b & 31); break;  // MUTANT M2
+152:      if (b == 0) result = 0;  // MUTANT M1
+
+## riscv-tests that FAIL with the mutations (expected: div, sra, srai, and lui, whose case 3 uses sra)
+rv32ui-lui: rvsim-iss: FAIL halt=tohost retired=47 pc=0x800000f8 tohost=0x00000007 failed_test=3
+rv32ui-sra: rvsim-iss: FAIL halt=tohost retired=50 pc=0x80000634 tohost=0x00000007 failed_test=3
+rv32ui-srai: rvsim-iss: FAIL halt=tohost retired=48 pc=0x80000350 tohost=0x00000007 failed_test=3
+rv32um-div: rvsim-iss: FAIL halt=tohost retired=80 pc=0x80000174 tohost=0x00000011 failed_test=8
+
+detected_by: 4 of 49 riscv-tests
