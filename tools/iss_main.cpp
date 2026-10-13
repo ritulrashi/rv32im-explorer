@@ -19,7 +19,7 @@
 
 #include "iss/iss.h"
 #include "iss/loader.h"
-#include "iss/trace.h"
+#include "common/trace.h"
 
 namespace {
 

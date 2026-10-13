@@ -9,7 +9,7 @@
 #include <ostream>
 #include <string>
 
-#include "iss/retire.h"
+#include "common/retire.h"
 
 namespace rvx {
 

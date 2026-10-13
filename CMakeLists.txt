@@ -19,15 +19,14 @@ endif()
 # Strict warnings for project code only (not third-party targets).
 set(RVX_WARNINGS -Wall -Wextra -Wpedantic -Wshadow -Werror)
 
-add_library(rvx_common STATIC src/common/decode.cpp)
+add_library(rvx_common STATIC src/common/decode.cpp src/common/trace.cpp)
 target_include_directories(rvx_common PUBLIC src)
 target_compile_options(rvx_common PRIVATE ${RVX_WARNINGS})
 
 add_library(rvx_iss STATIC
   src/iss/memory.cpp
   src/iss/iss.cpp
-  src/iss/loader.cpp
-  src/iss/trace.cpp)
+  src/iss/loader.cpp)
 target_include_directories(rvx_iss PUBLIC src)
 target_link_libraries(rvx_iss PUBLIC rvx_common)
 target_compile_options(rvx_iss PRIVATE ${RVX_WARNINGS})

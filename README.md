@@ -18,11 +18,11 @@ A cycle-accurate, parameterizable in-order RISC-V (RV32IM) pipeline model in C++
 ## Architecture (so far)
 
 ```
-src/common/decode.{h,cpp}   bits -> {op, rd, rs1, rs2, imm}. The ONLY code shared by ISS and pipeline.
+src/common/decode.{h,cpp}   bits -> {op, rd, rs1, rs2, imm}. The only instruction logic shared by ISS and pipeline.
 src/iss/memory.*            sparse little-endian memory, 4 KiB pages, unwritten = 0
 src/iss/iss.*               golden ISS: one instruction per step(), no timing
 src/iss/loader.*            hand-written ELF32 loader (PT_LOAD + symtab) and flat-binary loader
-src/iss/retire.h, trace.*   retire record + stable text trace (the lockstep contract)
+src/common/retire.h, trace.* retire record + stable text trace (the comparison contract, used by both models)
 tools/iss_main.cpp          rvsim-iss command-line driver
 tests/unit/                 GoogleTest: decode, memory, ISS semantics, loader, trace
 tests/riscv-tests-env/      minimal test environment replacing upstream env/p

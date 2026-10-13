@@ -10,7 +10,7 @@
 #include <string_view>
 
 #include "iss/memory.h"
-#include "iss/retire.h"
+#include "common/retire.h"
 
 namespace rvx::iss {
 
