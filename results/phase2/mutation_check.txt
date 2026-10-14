@@ -1,0 +1,129 @@
+# Phase 2 mutation check: does lockstep catch injected PIPELINE bugs?
+command: scripts/phase2_mutation_check.sh
+
+## Provenance (of the unmutated tree)
+date_utc: 2026-10-14T00:11:02Z
+commit: 6f0222d712d57242c8b97cf2afd19bae87097354
+tree: clean
+riscv-tests: 7b68f7b91f827f8d94cc1c57ff123752c5c8f704
+host: Linux 6.8.0-1064-azure x86_64
+os: Ubuntu 24.04.3 LTS
+lscpu:
+  Architecture:                            x86_64
+  CPU(s):                                  4
+  Model name:                              AMD EPYC 7763 64-Core Processor
+  Thread(s) per core:                      2
+  Core(s) per socket:                      2
+  Socket(s):                               1
+  L1d cache:                               64 KiB (2 instances)
+  L1i cache:                               64 KiB (2 instances)
+  L2 cache:                                1 MiB (2 instances)
+  L3 cache:                                32 MiB (1 instance)
+mem_total: 16377432 kB
+tools:
+  c++: c++ (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0
+  cmake: cmake version 3.28.3
+  ninja: 1.11.1
+  riscv-gcc: riscv64-unknown-elf-gcc (13.2.0-11ubuntu1+12) 13.2.0
+  riscv-binutils: GNU assembler (2.42-1ubuntu1+6) 2.42
+
+## Mutant Q1
+src/pipeline/exec.cpp:34:  // MUTANT Q1: correction removed
+riscv-tests detecting: 1 of 49
+random seeds 1-200: random-lockstep: seeds 1-200 programs=200 agree=101 diverge=99 incomplete=0 other=0 retirements_compared=32774
+first divergence report (rv32um-mulhsu.elf), first 20 lines:
+    DIVERGENCE (retire record mismatch) at cycle 82, after 65 matching retirements
+      field  iss          pipeline    
+      seq    65           65          
+      pc     80000104     80000104    
+      insn   02c5a733     02c5a733    
+             (mulhsu / mulhsu)
+      rd     x14          x14         
+      val    80004000     7fffc000      <-- MISMATCH
+      mem    -            -           
+      addr   -            -           
+      data   -            -           
+      sz     0            0           
+    last 8 retired instructions (identical in both models):
+      57 pc=800000e4 insn=800005b7 rd=x11 val=80000000 mem=- addr=- data=- sz=-  lui
+      58 pc=800000e8 insn=00000613 rd=x12 val=00000000 mem=- addr=- data=- sz=-  addi
+      59 pc=800000ec insn=02c5a733 rd=x14 val=00000000 mem=- addr=- data=- sz=-  mulhsu
+      60 pc=800000f0 insn=00000393 rd=x07 val=00000000 mem=- addr=- data=- sz=-  addi
+      61 pc=800000f4 insn=44771a63 rd=- val=- mem=- addr=- data=- sz=-  bne
+      62 pc=800000f8 insn=00700193 rd=x03 val=00000007 mem=- addr=- data=- sz=-  addi
+      63 pc=800000fc insn=800005b7 rd=x11 val=80000000 mem=- addr=- data=- sz=-  lui
+
+## Mutant Q2
+src/pipeline/pipeline.cpp:133:    if (false && ex_mem_.valid && ex_mem_.exc == HaltReason::None && ex_mem_.rd == rs) {  // MUTANT Q2
+riscv-tests detecting: 49 of 49
+random seeds 1-200: random-lockstep: seeds 1-200 programs=200 agree=0 diverge=200 incomplete=0 other=0 retirements_compared=0
+first divergence report (rv32ui-add.elf), first 20 lines:
+    DIVERGENCE (retire record mismatch) at cycle 46, after 41 matching retirements
+      field  iss          pipeline    
+      seq    41           41          
+      pc     800000a4     800000a4    
+      insn   00c58733     00c58733    
+             (add / add)
+      rd     x14          x14         
+      val    00000002     00000001      <-- MISMATCH
+      mem    -            -           
+      addr   -            -           
+      data   -            -           
+      sz     0            0           
+    last 8 retired instructions (identical in both models):
+      33 pc=80000084 insn=00000593 rd=x11 val=00000000 mem=- addr=- data=- sz=-  addi
+      34 pc=80000088 insn=00000613 rd=x12 val=00000000 mem=- addr=- data=- sz=-  addi
+      35 pc=8000008c insn=00c58733 rd=x14 val=00000000 mem=- addr=- data=- sz=-  add
+      36 pc=80000090 insn=00000393 rd=x07 val=00000000 mem=- addr=- data=- sz=-  addi
+      37 pc=80000094 insn=4c771663 rd=- val=- mem=- addr=- data=- sz=-  bne
+      38 pc=80000098 insn=00300193 rd=x03 val=00000003 mem=- addr=- data=- sz=-  addi
+      39 pc=8000009c insn=00100593 rd=x11 val=00000001 mem=- addr=- data=- sz=-  addi
+
+## Mutant Q3
+src/pipeline/pipeline.cpp:263:    c.load_use = false && ex_has_good_load &&  // MUTANT Q3
+riscv-tests detecting: 6 of 49
+random seeds 1-200: random-lockstep: seeds 1-200 programs=200 agree=33 diverge=167 incomplete=0 other=0 retirements_compared=10278
+first divergence report (rv32ui-lb.elf), first 20 lines:
+    DIVERGENCE (contract violation: load result needed from EX/MEM) at cycle 110, after 105 matching retirements
+    last 8 retired instructions (identical in both models):
+      97 pc=80000184 insn=e8008093 rd=x01 val=80002000 mem=- addr=- data=- sz=-  addi
+      98 pc=80000188 insn=ffa08093 rd=x01 val=80001ffa mem=- addr=- data=- sz=-  addi
+      99 pc=8000018c insn=00708283 rd=x05 val=00000000 mem=R addr=80002001 data=00000000 sz=1  lb
+      100 pc=80000190 insn=00000393 rd=x07 val=00000000 mem=- addr=- data=- sz=-  addi
+      101 pc=80000194 insn=14729c63 rd=- val=- mem=- addr=- data=- sz=-  bne
+      102 pc=80000198 insn=00c00193 rd=x03 val=0000000c mem=- addr=- data=- sz=-  addi
+      103 pc=8000019c insn=00000213 rd=x04 val=00000000 mem=- addr=- data=- sz=-  addi
+      104 pc=800001a0 insn=00002697 rd=x13 val=800021a0 mem=- addr=- data=- sz=-  auipc
+    pipeline state after cycle 110 (registers feeding the next cycle):
+      PC     800001b4
+      IF/ID  pc=800001b0 insn=ff000393
+      ID/EX  pc=800001ac insn=00070313
+      EX/MEM pc=800001a8 insn=00168703
+      MEM/WB pc=800001a4 insn=e6168693
+      last cycle control: redirect=0 (to 00000000) fault_flush=0 ex_busy=0 (md_cycles=0) load_use=0 fwd_rs1=EX/MEM fwd_rs2=-
+
+## Mutant Q4
+src/pipeline/exec.cpp:140:    case Op::LB: return raw;  // MUTANT Q4
+riscv-tests detecting: 4 of 49
+random seeds 1-200: random-lockstep: seeds 1-200 programs=200 agree=33 diverge=167 incomplete=0 other=0 retirements_compared=8081
+first divergence report (rv32ui-lb.elf), first 20 lines:
+    DIVERGENCE (retire record mismatch) at cycle 41, after 36 matching retirements
+      field  iss          pipeline    
+      seq    36           36          
+      pc     80000090     80000090    
+      insn   00010703     00010703    
+             (lb / lb)
+      rd     x14          x14         
+      val    ffffffff     000000ff      <-- MISMATCH
+      mem    R            R           
+      addr   80002000     80002000    
+      data   000000ff     000000ff    
+      sz     1            1           
+    last 8 retired instructions (identical in both models):
+      28 pc=80000070 insn=00000e93 rd=x29 val=00000000 mem=- addr=- data=- sz=-  addi
+      29 pc=80000074 insn=00000f13 rd=x30 val=00000000 mem=- addr=- data=- sz=-  addi
+      30 pc=80000078 insn=00000f93 rd=x31 val=00000000 mem=- addr=- data=- sz=-  addi
+      31 pc=8000007c insn=00000193 rd=x03 val=00000000 mem=- addr=- data=- sz=-  addi
+      32 pc=80000080 insn=00200193 rd=x03 val=00000002 mem=- addr=- data=- sz=-  addi
+      33 pc=80000084 insn=fff00793 rd=x15 val=ffffffff mem=- addr=- data=- sz=-  addi
+      34 pc=80000088 insn=00002117 rd=x02 val=80002088 mem=- addr=- data=- sz=-  auipc

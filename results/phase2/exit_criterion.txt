@@ -1,0 +1,165 @@
+# Phase 2 exit criterion: pipeline vs golden ISS in lockstep
+command: scripts/phase2_exit.sh
+pipeline config: defaults (mul_latency=3, div_latency=33)
+
+## Provenance
+date_utc: 2026-10-14T00:12:47Z
+commit: 6f0222d712d57242c8b97cf2afd19bae87097354
+tree: clean
+riscv-tests: 7b68f7b91f827f8d94cc1c57ff123752c5c8f704
+host: Linux 6.8.0-1064-azure x86_64
+os: Ubuntu 24.04.3 LTS
+lscpu:
+  Architecture:                            x86_64
+  CPU(s):                                  4
+  Model name:                              AMD EPYC 7763 64-Core Processor
+  Thread(s) per core:                      2
+  Core(s) per socket:                      2
+  Socket(s):                               1
+  L1d cache:                               64 KiB (2 instances)
+  L1i cache:                               64 KiB (2 instances)
+  L2 cache:                                1 MiB (2 instances)
+  L3 cache:                                32 MiB (1 instance)
+mem_total: 16377432 kB
+tools:
+  c++: c++ (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0
+  cmake: cmake version 3.28.3
+  ninja: 1.11.1
+  riscv-gcc: riscv64-unknown-elf-gcc (13.2.0-11ubuntu1+12) 13.2.0
+  riscv-binutils: GNU assembler (2.42-1ubuntu1+6) 2.42
+
+## Preset: asan
+### Full CTest suite
+100% tests passed, 0 tests failed out of 276
+determinism    = (2 tests)
+lockstep       = (50 tests)
+pipeline       = (49 tests)
+random         = (1 test)
+riscv-tests    = (49 tests)
+unit           = (126 tests)
+failed tests: none
+### Directed pipeline timing tests
+[  PASSED  ] 34 tests.
+### Lockstep on riscv-tests (retired instructions and pipeline cycles per test)
+LOCKSTEP OK rv32ui-add.elf: retired=460 cycles=496 halt=tohost tohost=00000001
+LOCKSTEP OK rv32ui-addi.elf: retired=237 cycles=255 halt=tohost tohost=00000001
+LOCKSTEP OK rv32ui-and.elf: retired=480 cycles=516 halt=tohost tohost=00000001
+LOCKSTEP OK rv32ui-andi.elf: retired=193 cycles=211 halt=tohost tohost=00000001
+LOCKSTEP OK rv32ui-auipc.elf: retired=54 cycles=64 halt=tohost tohost=00000001
+LOCKSTEP OK rv32ui-beq.elf: retired=286 cycles=344 halt=tohost tohost=00000001
+LOCKSTEP OK rv32ui-bge.elf: retired=304 cycles=380 halt=tohost tohost=00000001
+LOCKSTEP OK rv32ui-bgeu.elf: retired=329 cycles=405 halt=tohost tohost=00000001
+LOCKSTEP OK rv32ui-blt.elf: retired=286 cycles=344 halt=tohost tohost=00000001
+LOCKSTEP OK rv32ui-bltu.elf: retired=311 cycles=369 halt=tohost tohost=00000001
+LOCKSTEP OK rv32ui-bne.elf: retired=286 cycles=348 halt=tohost tohost=00000001
+LOCKSTEP OK rv32ui-fence_i.elf: retired=294 cycles=510 halt=tohost tohost=00000001
+LOCKSTEP OK rv32ui-jal.elf: retired=50 cycles=60 halt=tohost tohost=00000001
+LOCKSTEP OK rv32ui-jalr.elf: retired=110 cycles=140 halt=tohost tohost=00000001
+LOCKSTEP OK rv32ui-lb.elf: retired=248 cycles=268 halt=tohost tohost=00000001
+LOCKSTEP OK rv32ui-lbu.elf: retired=248 cycles=268 halt=tohost tohost=00000001
+LOCKSTEP OK rv32ui-ld_st.elf: retired=958 cycles=1108 halt=tohost tohost=00000001
+LOCKSTEP OK rv32ui-lh.elf: retired=264 cycles=284 halt=tohost tohost=00000001
+LOCKSTEP OK rv32ui-lhu.elf: retired=273 cycles=293 halt=tohost tohost=00000001
+LOCKSTEP OK rv32ui-lui.elf: retired=60 cycles=66 halt=tohost tohost=00000001
+LOCKSTEP OK rv32ui-lw.elf: retired=278 cycles=298 halt=tohost tohost=00000001
+LOCKSTEP OK rv32ui-or.elf: retired=483 cycles=519 halt=tohost tohost=00000001
+LOCKSTEP OK rv32ui-ori.elf: retired=200 cycles=218 halt=tohost tohost=00000001
+LOCKSTEP OK rv32ui-sb.elf: retired=449 cycles=495 halt=tohost tohost=00000001
+LOCKSTEP OK rv32ui-sh.elf: retired=502 cycles=548 halt=tohost tohost=00000001
+LOCKSTEP OK rv32ui-simple.elf: retired=36 cycles=40 halt=tohost tohost=00000001
+LOCKSTEP OK rv32ui-sll.elf: retired=488 cycles=524 halt=tohost tohost=00000001
+LOCKSTEP OK rv32ui-slli.elf: retired=236 cycles=254 halt=tohost tohost=00000001
+LOCKSTEP OK rv32ui-slt.elf: retired=454 cycles=490 halt=tohost tohost=00000001
+LOCKSTEP OK rv32ui-slti.elf: retired=232 cycles=250 halt=tohost tohost=00000001
+LOCKSTEP OK rv32ui-sltiu.elf: retired=232 cycles=250 halt=tohost tohost=00000001
+LOCKSTEP OK rv32ui-sltu.elf: retired=454 cycles=490 halt=tohost tohost=00000001
+LOCKSTEP OK rv32ui-sra.elf: retired=507 cycles=543 halt=tohost tohost=00000001
+LOCKSTEP OK rv32ui-srai.elf: retired=251 cycles=269 halt=tohost tohost=00000001
+LOCKSTEP OK rv32ui-srl.elf: retired=501 cycles=537 halt=tohost tohost=00000001
+LOCKSTEP OK rv32ui-srli.elf: retired=245 cycles=263 halt=tohost tohost=00000001
+LOCKSTEP OK rv32ui-st_ld.elf: retired=478 cycles=484 halt=tohost tohost=00000001
+LOCKSTEP OK rv32ui-sub.elf: retired=452 cycles=488 halt=tohost tohost=00000001
+LOCKSTEP OK rv32ui-sw.elf: retired=509 cycles=555 halt=tohost tohost=00000001
+LOCKSTEP OK rv32ui-xor.elf: retired=482 cycles=518 halt=tohost tohost=00000001
+LOCKSTEP OK rv32ui-xori.elf: retired=202 cycles=220 halt=tohost tohost=00000001
+LOCKSTEP OK rv32um-div.elf: retired=91 cycles=385 halt=tohost tohost=00000001
+LOCKSTEP OK rv32um-divu.elf: retired=92 cycles=386 halt=tohost tohost=00000001
+LOCKSTEP OK rv32um-mul.elf: retired=454 cycles=592 halt=tohost tohost=00000001
+LOCKSTEP OK rv32um-mulh.elf: retired=454 cycles=588 halt=tohost tohost=00000001
+LOCKSTEP OK rv32um-mulhsu.elf: retired=454 cycles=588 halt=tohost tohost=00000001
+LOCKSTEP OK rv32um-mulhu.elf: retired=454 cycles=588 halt=tohost tohost=00000001
+LOCKSTEP OK rv32um-rem.elf: retired=91 cycles=385 halt=tohost tohost=00000001
+LOCKSTEP OK rv32um-remu.elf: retired=91 cycles=385 halt=tohost tohost=00000001
+riscv-tests in lockstep: 49 of 49 agree
+### Determinism: second run of the same 49 programs
+identical output (retired and cycle counts) across two runs: yes
+### Random programs (rvgen seeds 1-1000)
+random-lockstep: seeds 1-1000 programs=1000 agree=1000 diverge=0 incomplete=0 other=0 retirements_compared=399342
+
+## Preset: release
+### Full CTest suite
+100% tests passed, 0 tests failed out of 276
+determinism    = (2 tests)
+lockstep       = (50 tests)
+pipeline       = (49 tests)
+random         = (1 test)
+riscv-tests    = (49 tests)
+unit           = (126 tests)
+failed tests: none
+### Directed pipeline timing tests
+[  PASSED  ] 34 tests.
+### Lockstep on riscv-tests (retired instructions and pipeline cycles per test)
+LOCKSTEP OK rv32ui-add.elf: retired=460 cycles=496 halt=tohost tohost=00000001
+LOCKSTEP OK rv32ui-addi.elf: retired=237 cycles=255 halt=tohost tohost=00000001
+LOCKSTEP OK rv32ui-and.elf: retired=480 cycles=516 halt=tohost tohost=00000001
+LOCKSTEP OK rv32ui-andi.elf: retired=193 cycles=211 halt=tohost tohost=00000001
+LOCKSTEP OK rv32ui-auipc.elf: retired=54 cycles=64 halt=tohost tohost=00000001
+LOCKSTEP OK rv32ui-beq.elf: retired=286 cycles=344 halt=tohost tohost=00000001
+LOCKSTEP OK rv32ui-bge.elf: retired=304 cycles=380 halt=tohost tohost=00000001
+LOCKSTEP OK rv32ui-bgeu.elf: retired=329 cycles=405 halt=tohost tohost=00000001
+LOCKSTEP OK rv32ui-blt.elf: retired=286 cycles=344 halt=tohost tohost=00000001
+LOCKSTEP OK rv32ui-bltu.elf: retired=311 cycles=369 halt=tohost tohost=00000001
+LOCKSTEP OK rv32ui-bne.elf: retired=286 cycles=348 halt=tohost tohost=00000001
+LOCKSTEP OK rv32ui-fence_i.elf: retired=294 cycles=510 halt=tohost tohost=00000001
+LOCKSTEP OK rv32ui-jal.elf: retired=50 cycles=60 halt=tohost tohost=00000001
+LOCKSTEP OK rv32ui-jalr.elf: retired=110 cycles=140 halt=tohost tohost=00000001
+LOCKSTEP OK rv32ui-lb.elf: retired=248 cycles=268 halt=tohost tohost=00000001
+LOCKSTEP OK rv32ui-lbu.elf: retired=248 cycles=268 halt=tohost tohost=00000001
+LOCKSTEP OK rv32ui-ld_st.elf: retired=958 cycles=1108 halt=tohost tohost=00000001
+LOCKSTEP OK rv32ui-lh.elf: retired=264 cycles=284 halt=tohost tohost=00000001
+LOCKSTEP OK rv32ui-lhu.elf: retired=273 cycles=293 halt=tohost tohost=00000001
+LOCKSTEP OK rv32ui-lui.elf: retired=60 cycles=66 halt=tohost tohost=00000001
+LOCKSTEP OK rv32ui-lw.elf: retired=278 cycles=298 halt=tohost tohost=00000001
+LOCKSTEP OK rv32ui-or.elf: retired=483 cycles=519 halt=tohost tohost=00000001
+LOCKSTEP OK rv32ui-ori.elf: retired=200 cycles=218 halt=tohost tohost=00000001
+LOCKSTEP OK rv32ui-sb.elf: retired=449 cycles=495 halt=tohost tohost=00000001
+LOCKSTEP OK rv32ui-sh.elf: retired=502 cycles=548 halt=tohost tohost=00000001
+LOCKSTEP OK rv32ui-simple.elf: retired=36 cycles=40 halt=tohost tohost=00000001
+LOCKSTEP OK rv32ui-sll.elf: retired=488 cycles=524 halt=tohost tohost=00000001
+LOCKSTEP OK rv32ui-slli.elf: retired=236 cycles=254 halt=tohost tohost=00000001
+LOCKSTEP OK rv32ui-slt.elf: retired=454 cycles=490 halt=tohost tohost=00000001
+LOCKSTEP OK rv32ui-slti.elf: retired=232 cycles=250 halt=tohost tohost=00000001
+LOCKSTEP OK rv32ui-sltiu.elf: retired=232 cycles=250 halt=tohost tohost=00000001
+LOCKSTEP OK rv32ui-sltu.elf: retired=454 cycles=490 halt=tohost tohost=00000001
+LOCKSTEP OK rv32ui-sra.elf: retired=507 cycles=543 halt=tohost tohost=00000001
+LOCKSTEP OK rv32ui-srai.elf: retired=251 cycles=269 halt=tohost tohost=00000001
+LOCKSTEP OK rv32ui-srl.elf: retired=501 cycles=537 halt=tohost tohost=00000001
+LOCKSTEP OK rv32ui-srli.elf: retired=245 cycles=263 halt=tohost tohost=00000001
+LOCKSTEP OK rv32ui-st_ld.elf: retired=478 cycles=484 halt=tohost tohost=00000001
+LOCKSTEP OK rv32ui-sub.elf: retired=452 cycles=488 halt=tohost tohost=00000001
+LOCKSTEP OK rv32ui-sw.elf: retired=509 cycles=555 halt=tohost tohost=00000001
+LOCKSTEP OK rv32ui-xor.elf: retired=482 cycles=518 halt=tohost tohost=00000001
+LOCKSTEP OK rv32ui-xori.elf: retired=202 cycles=220 halt=tohost tohost=00000001
+LOCKSTEP OK rv32um-div.elf: retired=91 cycles=385 halt=tohost tohost=00000001
+LOCKSTEP OK rv32um-divu.elf: retired=92 cycles=386 halt=tohost tohost=00000001
+LOCKSTEP OK rv32um-mul.elf: retired=454 cycles=592 halt=tohost tohost=00000001
+LOCKSTEP OK rv32um-mulh.elf: retired=454 cycles=588 halt=tohost tohost=00000001
+LOCKSTEP OK rv32um-mulhsu.elf: retired=454 cycles=588 halt=tohost tohost=00000001
+LOCKSTEP OK rv32um-mulhu.elf: retired=454 cycles=588 halt=tohost tohost=00000001
+LOCKSTEP OK rv32um-rem.elf: retired=91 cycles=385 halt=tohost tohost=00000001
+LOCKSTEP OK rv32um-remu.elf: retired=91 cycles=385 halt=tohost tohost=00000001
+riscv-tests in lockstep: 49 of 49 agree
+### Determinism: second run of the same 49 programs
+identical output (retired and cycle counts) across two runs: yes
+### Random programs (rvgen seeds 1-1000)
+random-lockstep: seeds 1-1000 programs=1000 agree=1000 diverge=0 incomplete=0 other=0 retirements_compared=399342
