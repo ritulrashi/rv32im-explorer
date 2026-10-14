@@ -1,0 +1,219 @@
+# Phase 3 exit criterion: predictors, caches, DRAM, CPI stack
+command: scripts/phase3_exit.sh
+
+## Provenance
+date_utc: 2026-10-14T00:46:45Z
+commit: 4f57fc2d76572a87181ac9ad5e4174870aea8b47
+tree: clean
+riscv-tests: 7b68f7b91f827f8d94cc1c57ff123752c5c8f704
+host: Linux 6.8.0-1064-azure x86_64
+os: Ubuntu 24.04.3 LTS
+lscpu:
+  Architecture:                            x86_64
+  CPU(s):                                  4
+  Model name:                              AMD EPYC 7763 64-Core Processor
+  Thread(s) per core:                      2
+  Core(s) per socket:                      2
+  Socket(s):                               1
+  L1d cache:                               64 KiB (2 instances)
+  L1i cache:                               64 KiB (2 instances)
+  L2 cache:                                1 MiB (2 instances)
+  L3 cache:                                32 MiB (1 instance)
+mem_total: 16377436 kB
+tools:
+  c++: c++ (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0
+  cmake: cmake version 3.28.3
+  ninja: 1.11.1
+  riscv-gcc: riscv64-unknown-elf-gcc (13.2.0-11ubuntu1+12) 13.2.0
+  riscv-binutils: GNU assembler (2.42-1ubuntu1+6) 2.42
+
+## Configurations
+### configs/baseline.cfg
+    core.mul_latency = 3
+    core.div_latency = 33
+    bpred.type = static_nt
+    bpred.entries = 512
+    bpred.history_bits = 8
+    btb.entries = 0
+    icache.enabled = false
+    dcache.enabled = false
+### configs/bimodal_btb.cfg
+    bpred.type = bimodal
+    bpred.entries = 512
+    btb.entries = 64
+    icache.enabled = false
+    dcache.enabled = false
+### configs/gshare_btb.cfg
+    bpred.type = gshare
+    bpred.entries = 1024
+    bpred.history_bits = 10
+    btb.entries = 64
+    icache.enabled = false
+    dcache.enabled = false
+### configs/small_caches.cfg
+    bpred.type = bimodal
+    bpred.entries = 512
+    btb.entries = 64
+    icache.enabled = true
+    icache.size_bytes = 1024
+    icache.assoc = 2
+    icache.line_bytes = 16
+    dcache.enabled = true
+    dcache.size_bytes = 1024
+    dcache.assoc = 2
+    dcache.line_bytes = 16
+### configs/big.cfg
+    bpred.type = gshare
+    bpred.entries = 4096
+    bpred.history_bits = 12
+    btb.entries = 256
+    icache.enabled = true
+    icache.size_bytes = 16384
+    icache.assoc = 4
+    icache.line_bytes = 32
+    dcache.enabled = true
+    dcache.size_bytes = 16384
+    dcache.assoc = 4
+    dcache.line_bytes = 32
+
+## Preset: asan
+### Full CTest suite
+100% tests passed, 0 tests failed out of 324
+configs        = (5 tests)
+cpi            = (1 test)
+determinism    = (2 tests)
+lockstep       = (55 tests)
+pipeline       = (49 tests)
+random         = (6 tests)
+regression     = (1 test)
+unit           = (167 tests)
+failed tests: none
+### Directed tests with hand-computed expected values (Phase 3 components)
+[       OK ] KvFile.ParsesKeysValuesAndComments
+[       OK ] KvFile.RejectsMalformedLines
+[       OK ] KvFile.ParsesOverride
+[       OK ] MachineConfig.DefaultsAreThePhase2Baseline
+[       OK ] MachineConfig.AppliesEverySetting
+[       OK ] MachineConfig.RejectsUnknownKeysAndBadValues
+[       OK ] MachineConfig.ValidationRejectsImpossibleMachines
+[       OK ] MachineConfig.DescribeRoundTrips
+[       OK ] StaticNT.AlwaysNotTaken
+[       OK ] Bimodal.CounterTransitionsAndSaturation
+[       OK ] Bimodal.PcsThatShareLowBitsAlias
+[       OK ] Bimodal.LoopBranchPattern
+[       OK ] Bimodal.AlternatingPatternDefeatsIt
+[       OK ] Gshare.IndexIsPcXorHistory
+[       OK ] Gshare.LearnsAlternatingPatternAfterWarmup
+[       OK ] Btb.MissThenHitThenReplace
+[       OK ] Btb.FullTagsPreventAliasing
+[       OK ] Btb.ZeroEntriesIsDisabled
+[       OK ] Cache.Geometry
+[       OK ] Cache.HandTracedLruAndWritebackSequence
+[       OK ] Cache.WriteAllocateMakesLineDirty
+[       OK ] Cache.DirectMappedConflicts
+[       OK ] Cache.InvalidateAll
+[       OK ] Dram.HandTracedRowBufferSequence
+[       OK ] MemSystem.DisabledCachesCostNothingAndTouchNoDram
+[       OK ] MemSystem.MissPenaltyIncludesWritebackFillAndTransfer
+[       OK ] MemSystem.FenceIInvalidatesOnlyTheICache
+[       OK ] P3.LoopStaticNotTaken
+[       OK ] P3.LoopBimodalNoBtb
+[       OK ] P3.LoopBimodalWithBtb
+[       OK ] P3.JalUsesIdRedirectOnlyWithADynamicPredictor
+[       OK ] P3.GshareTrainsTheCounterItPredictedWith
+[       OK ] P3.TakenJumpToNextInstructionIsStillAMisprediction
+[       OK ] P3.ColdICacheStraightLine
+[       OK ] P3.WrongPathIMissInFlightDelaysTheRedirect
+[       OK ] P3.FenceIInvalidatesICacheAndRefetches
+[       OK ] P3.DCacheFirstTouchMissesSameLineHits
+[       OK ] P3.DirtyEvictionAddsWritebackAndRowMiss
+[       OK ] P3.MulOverlapsWithADCacheMiss
+[       OK ] P3.OperandHeldInExSurvivesProducerRetiringDuringDMiss
+[       OK ] P3.LoadUseAndMulDivAreAttributed
+[  PASSED  ] 41 tests.
+### Phase 2 regression (baseline config vs results/phase2)
+phase2-regression: baseline matches the Phase 2 record for all 49 riscv-tests
+### CPI stack sums to total cycles
+cpi-sum: 245 of 245 runs (5 configs x 49 programs) have CPI stack == total cycles and pass
+### Lockstep under every config
+baseline: riscv-tests 49 of 49 agree
+baseline: random-lockstep: seeds 1-200 programs=200 agree=200 diverge=0 incomplete=0 other=0 retirements_compared=74757
+bimodal_btb: riscv-tests 49 of 49 agree
+bimodal_btb: random-lockstep: seeds 1-200 programs=200 agree=200 diverge=0 incomplete=0 other=0 retirements_compared=74757
+gshare_btb: riscv-tests 49 of 49 agree
+gshare_btb: random-lockstep: seeds 1-200 programs=200 agree=200 diverge=0 incomplete=0 other=0 retirements_compared=74757
+small_caches: riscv-tests 49 of 49 agree
+small_caches: random-lockstep: seeds 1-200 programs=200 agree=200 diverge=0 incomplete=0 other=0 retirements_compared=74757
+big: riscv-tests 49 of 49 agree
+big: random-lockstep: seeds 1-200 programs=200 agree=200 diverge=0 incomplete=0 other=0 retirements_compared=74757
+
+## Preset: release
+### Full CTest suite
+100% tests passed, 0 tests failed out of 324
+configs        = (5 tests)
+cpi            = (1 test)
+determinism    = (2 tests)
+lockstep       = (55 tests)
+pipeline       = (49 tests)
+random         = (6 tests)
+regression     = (1 test)
+unit           = (167 tests)
+failed tests: none
+### Directed tests with hand-computed expected values (Phase 3 components)
+[       OK ] KvFile.ParsesKeysValuesAndComments
+[       OK ] KvFile.RejectsMalformedLines
+[       OK ] KvFile.ParsesOverride
+[       OK ] MachineConfig.DefaultsAreThePhase2Baseline
+[       OK ] MachineConfig.AppliesEverySetting
+[       OK ] MachineConfig.RejectsUnknownKeysAndBadValues
+[       OK ] MachineConfig.ValidationRejectsImpossibleMachines
+[       OK ] MachineConfig.DescribeRoundTrips
+[       OK ] StaticNT.AlwaysNotTaken
+[       OK ] Bimodal.CounterTransitionsAndSaturation
+[       OK ] Bimodal.PcsThatShareLowBitsAlias
+[       OK ] Bimodal.LoopBranchPattern
+[       OK ] Bimodal.AlternatingPatternDefeatsIt
+[       OK ] Gshare.IndexIsPcXorHistory
+[       OK ] Gshare.LearnsAlternatingPatternAfterWarmup
+[       OK ] Btb.MissThenHitThenReplace
+[       OK ] Btb.FullTagsPreventAliasing
+[       OK ] Btb.ZeroEntriesIsDisabled
+[       OK ] Cache.Geometry
+[       OK ] Cache.HandTracedLruAndWritebackSequence
+[       OK ] Cache.WriteAllocateMakesLineDirty
+[       OK ] Cache.DirectMappedConflicts
+[       OK ] Cache.InvalidateAll
+[       OK ] Dram.HandTracedRowBufferSequence
+[       OK ] MemSystem.DisabledCachesCostNothingAndTouchNoDram
+[       OK ] MemSystem.MissPenaltyIncludesWritebackFillAndTransfer
+[       OK ] MemSystem.FenceIInvalidatesOnlyTheICache
+[       OK ] P3.LoopStaticNotTaken
+[       OK ] P3.LoopBimodalNoBtb
+[       OK ] P3.LoopBimodalWithBtb
+[       OK ] P3.JalUsesIdRedirectOnlyWithADynamicPredictor
+[       OK ] P3.GshareTrainsTheCounterItPredictedWith
+[       OK ] P3.TakenJumpToNextInstructionIsStillAMisprediction
+[       OK ] P3.ColdICacheStraightLine
+[       OK ] P3.WrongPathIMissInFlightDelaysTheRedirect
+[       OK ] P3.FenceIInvalidatesICacheAndRefetches
+[       OK ] P3.DCacheFirstTouchMissesSameLineHits
+[       OK ] P3.DirtyEvictionAddsWritebackAndRowMiss
+[       OK ] P3.MulOverlapsWithADCacheMiss
+[       OK ] P3.OperandHeldInExSurvivesProducerRetiringDuringDMiss
+[       OK ] P3.LoadUseAndMulDivAreAttributed
+[  PASSED  ] 41 tests.
+### Phase 2 regression (baseline config vs results/phase2)
+phase2-regression: baseline matches the Phase 2 record for all 49 riscv-tests
+### CPI stack sums to total cycles
+cpi-sum: 245 of 245 runs (5 configs x 49 programs) have CPI stack == total cycles and pass
+### Lockstep under every config
+baseline: riscv-tests 49 of 49 agree
+baseline: random-lockstep: seeds 1-200 programs=200 agree=200 diverge=0 incomplete=0 other=0 retirements_compared=74757
+bimodal_btb: riscv-tests 49 of 49 agree
+bimodal_btb: random-lockstep: seeds 1-200 programs=200 agree=200 diverge=0 incomplete=0 other=0 retirements_compared=74757
+gshare_btb: riscv-tests 49 of 49 agree
+gshare_btb: random-lockstep: seeds 1-200 programs=200 agree=200 diverge=0 incomplete=0 other=0 retirements_compared=74757
+small_caches: riscv-tests 49 of 49 agree
+small_caches: random-lockstep: seeds 1-200 programs=200 agree=200 diverge=0 incomplete=0 other=0 retirements_compared=74757
+big: riscv-tests 49 of 49 agree
+big: random-lockstep: seeds 1-200 programs=200 agree=200 diverge=0 incomplete=0 other=0 retirements_compared=74757

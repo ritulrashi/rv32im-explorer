@@ -1,0 +1,80 @@
+# Phase 3 mutation check: do the tests catch injected timing bugs?
+command: scripts/phase3_mutation_check.sh
+
+## Provenance (of the unmutated tree)
+date_utc: 2026-10-14T00:43:31Z
+commit: 4f57fc2d76572a87181ac9ad5e4174870aea8b47
+tree: clean
+riscv-tests: 7b68f7b91f827f8d94cc1c57ff123752c5c8f704
+host: Linux 6.8.0-1064-azure x86_64
+os: Ubuntu 24.04.3 LTS
+lscpu:
+  Architecture:                            x86_64
+  CPU(s):                                  4
+  Model name:                              AMD EPYC 7763 64-Core Processor
+  Thread(s) per core:                      2
+  Core(s) per socket:                      2
+  Socket(s):                               1
+  L1d cache:                               64 KiB (2 instances)
+  L1i cache:                               64 KiB (2 instances)
+  L2 cache:                                1 MiB (2 instances)
+  L3 cache:                                32 MiB (1 instance)
+mem_total: 16377436 kB
+tools:
+  c++: c++ (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0
+  cmake: cmake version 3.28.3
+  ninja: 1.11.1
+  riscv-gcc: riscv64-unknown-elf-gcc (13.2.0-11ubuntu1+12) 13.2.0
+  riscv-binutils: GNU assembler (2.42-1ubuntu1+6) 2.42
+
+## Mutant R1
+src/pipeline/pipeline.cpp:482:      n_pc = target; n_fetched = false; n_if_wait = 0; n_pending.reset();  // MUTANT R1
+unit tests failing: 1
+    P3.WrongPathIMissInFlightDelaysTheRedirect
+lockstep, small_caches, seeds 1-50: random-lockstep: seeds 1-50 programs=50 agree=50 diverge=0 incomplete=0 other=0 retirements_compared=16188
+
+## Mutant R2
+src/pipeline/pipeline.cpp:475:      // MUTANT R2: operands not re-latched
+unit tests failing: 1
+    P3.OperandHeldInExSurvivesProducerRetiringDuringDMiss
+lockstep, small_caches, seeds 1-50: random-lockstep: seeds 1-50 programs=50 agree=30 diverge=20 incomplete=0 other=0 retirements_compared=9174
+
+## Mutant R3
+src/pipeline/pipeline.cpp:280:      if (c.mem_stall && done < latency) { c.ex_busy = true; n_md_cycles = md_cycles_; }  // MUTANT R3
+unit tests failing: 1
+    P3.MulOverlapsWithADCacheMiss
+lockstep, small_caches, seeds 1-50: random-lockstep: seeds 1-50 programs=50 agree=50 diverge=0 incomplete=0 other=0 retirements_compared=16188
+
+## Mutant R4
+src/cache/cache.cpp:36:      if (ways[w].last_use > victim->last_use) victim = &ways[w];  // MUTANT R4
+unit tests failing: 2
+    Cache.HandTracedLruAndWritebackSequence
+    Cache.WriteAllocateMakesLineDirty
+lockstep, small_caches, seeds 1-50: random-lockstep: seeds 1-50 programs=50 agree=50 diverge=0 incomplete=0 other=0 retirements_compared=16188
+
+## Mutant R5
+src/pipeline/pipeline.cpp:549:      dir_.train(dir_.index(id_ex_.pc), tr.taken);  // MUTANT R5
+unit tests failing: 1
+    P3.GshareTrainsTheCounterItPredictedWith
+lockstep, small_caches, seeds 1-50: random-lockstep: seeds 1-50 programs=50 agree=50 diverge=0 incomplete=0 other=0 retirements_compared=16188
+
+## Mutant R6
+src/pipeline/pipeline.cpp:85:        cat = CpiCat::Base;  // MUTANT R6
+unit tests failing: 3
+    P3.LoopBimodalNoBtb
+    P3.JalUsesIdRedirectOnlyWithADynamicPredictor
+    P3.TakenJumpToNextInstructionIsStillAMisprediction
+lockstep, small_caches, seeds 1-50: random-lockstep: seeds 1-50 programs=50 agree=50 diverge=0 incomplete=0 other=0 retirements_compared=16188
+
+## Mutant R7
+src/cache/dram.cpp:18:    latency = cfg_.row_miss_cycles;  // MUTANT R7
+unit tests failing: 8
+    Dram.HandTracedRowBufferSequence
+    MemSystem.MissPenaltyIncludesWritebackFillAndTransfer
+    MemSystem.FenceIInvalidatesOnlyTheICache
+    P3.ColdICacheStraightLine
+    P3.WrongPathIMissInFlightDelaysTheRedirect
+    P3.FenceIInvalidatesICacheAndRefetches
+    P3.DCacheFirstTouchMissesSameLineHits
+    P3.DirtyEvictionAddsWritebackAndRowMiss
+lockstep, small_caches, seeds 1-50: random-lockstep: seeds 1-50 programs=50 agree=50 diverge=0 incomplete=0 other=0 retirements_compared=16188
