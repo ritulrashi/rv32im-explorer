@@ -89,7 +89,7 @@ is about 58 s). So:
 | Trigger | Job | What runs |
 |---|---|---|
 | every push and PR | `regression` | **ASan build:** every CTest label *except* `workloads` (golden ISS tests, pipeline timing, lockstep, random seeds, CPI sum, Phase 2 regression, configs, RTL lint and correlation smoke, determinism). **Release build:** the `workloads` label (all 30 workloads pass + lockstep), plus `correlate.sh` on rvgen seeds 1–100 |
-| nightly (cron) and manual | `full` | everything under ASan, including the workloads, plus the Phase 2/3/5 exit scripts |
+| nightly (cron) and manual | `full` | everything under ASan, including the workloads, plus RTL correlation on rvgen seeds 1–500 (the phase exit scripts are not run in CI: they write committed results files) |
 
 So every push runs the complete regression the spec asks for: golden tests,
 lockstep, random seeds, CPI-sum assertions, and RTL correlation. Each part

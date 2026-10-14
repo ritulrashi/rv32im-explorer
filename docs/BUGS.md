@@ -16,6 +16,8 @@ Every bug found and fixed, with how it was detected.
 
 | 6 | 5 | `scripts/correlate.sh` (correlation harness) | Under RTL mutant V3 (load-use stall removed), the summary read "63 of 279 programs", but only 117 programs were run | `rvsim-rtl`'s stdout was not redirected. When the RTL's contract assertion fired, Verilator printed the `$error` message on stdout, and those lines became extra entries in `programs.txt`. Verdicts were unaffected; the totals were inflated. Fix: capture stdout of both simulators to per-program files. | Reading the Phase 5 mutation-check output: the program total did not equal the number of programs launched | see git log: "Phase 5" |
 
+| 7 | 6 | `scripts/phase6_exit.sh` (result provenance) | All three sweep provenance files from the first official Phase 6 run said `tree: DIRTY`, although the checkout was clean at commit a6ed84a | The same class as bug #2. Each sweep records `env_report` when it starts, but the script wrote earlier outputs (the regression timing, earlier sweeps) straight into `results/phase6`, so each later step saw untracked files. Fix: write everything to a temporary directory outside the repo and move it into `results/phase6` at the end. | Checking the `tree:` line of every provenance file before committing results | see git log: "Phase 6" |
+
 ## Notes on bug #1
 
 - Fix: spin loops in `RVTEST_PASS`/`RVTEST_FAIL` now use `j .` (no label). The env now defines no numeric labels beyond upstream's single `1:` in `RVTEST_FAIL`. A comment in the header warns about this.
