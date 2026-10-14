@@ -15,7 +15,7 @@ A cycle-accurate, parameterizable in-order RISC-V (RV32IM) pipeline model in C++
 | 3 | Branch predictors, caches, DRAM model, config files, CPI stack | **Done.** [results/phase3/](results/phase3/) |
 | 4 | Assembly and clang-compiled workloads, compiler analysis, [RESULTS.md](RESULTS.md) | **Done.** [results/phase4/](results/phase4/) |
 | 5 | SystemVerilog RV32I RTL + Verilator correlation ([CORRELATION.md](docs/CORRELATION.md)) | **Done.** [results/phase5/](results/phase5/) |
-| 6 | Parallel sweeps → CSV, plots, GitHub Actions regression | **Done.** [results/phase6/](results/phase6/), [plots](results/phase6/PLOTS.md) |
+| 6 | Parallel sweeps → CSV, plots, GitHub Actions regression | **Done.** Push regression measured at commit b8e2d94: GitHub Actions job 148 s ([regression_runtime_github.txt](results/phase6/regression_runtime_github.txt)), Codespace 132 s ([regression_runtime_codespace.txt](results/phase6/regression_runtime_codespace.txt)). [Sweeps](results/phase6/sweeps/), [plots](results/phase6/PLOTS.md) |
 
 ## Architecture
 

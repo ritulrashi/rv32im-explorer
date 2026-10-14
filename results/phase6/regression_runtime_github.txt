@@ -1,0 +1,18 @@
+# GitHub Actions regression runtime
+command: scripts/ci_runtime.sh b8e2d947f7c1ce89427e5d6d732444be42914c42
+repository: ritulrashi/rv32im-explorer
+commit: b8e2d947f7c1ce89427e5d6d732444be42914c42
+run: https://github.com/ritulrashi/rv32im-explorer/actions/runs/38513672200
+conclusion: success
+job regression: success, started 2026-10-14T04:52:46Z, completed 2026-10-14T04:55:14Z
+job full: skipped, started 2026-10-14T04:52:44Z, completed 2026-10-14T04:52:43Z
+  step 1 Set up job: success, 2026-10-14T04:52:47Z -> 2026-10-14T04:52:48Z
+  step 2 Run actions/checkout@v4: success, 2026-10-14T04:52:48Z -> 2026-10-14T04:52:52Z
+  step 3 Install toolchain (same script as the dev container): success, 2026-10-14T04:52:52Z -> 2026-10-14T04:53:33Z
+  step 4 Regression (golden ISS, pipeline timing, lockstep, random seeds, CPI sum, Phase 2 regression, workloads, RTL correlation): success, 2026-10-14T04:53:33Z -> 2026-10-14T04:55:10Z
+  step 5 Timing summary: success, 2026-10-14T04:55:10Z -> 2026-10-14T04:55:10Z
+  step 6 Run actions/upload-artifact@v4: success, 2026-10-14T04:55:10Z -> 2026-10-14T04:55:11Z
+  step 12 Post Run actions/checkout@v4: success, 2026-10-14T04:55:11Z -> 2026-10-14T04:55:12Z
+  step 13 Complete job: success, 2026-10-14T04:55:12Z -> 2026-10-14T04:55:12Z
+job regression wall time (s):148
+runner: ubuntu-24.04 (GitHub-hosted; public repository standard runner)

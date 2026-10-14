@@ -1,0 +1,42 @@
+# Regression runtime (push)
+command: scripts/phase6_regression.sh 
+parallel jobs: 4
+
+## Provenance
+date_utc: 2026-10-14T04:55:09Z
+commit: b8e2d947f7c1ce89427e5d6d732444be42914c42
+tree: clean
+riscv-tests: 7b68f7b91f827f8d94cc1c57ff123752c5c8f704
+host: Linux 6.8.0-1064-azure x86_64
+os: Ubuntu 24.04.3 LTS
+lscpu:
+  Architecture:                            x86_64
+  CPU(s):                                  4
+  Model name:                              AMD EPYC 7763 64-Core Processor
+  Thread(s) per core:                      2
+  Core(s) per socket:                      2
+  Socket(s):                               1
+  L1d cache:                               64 KiB (2 instances)
+  L1i cache:                               64 KiB (2 instances)
+  L2 cache:                                1 MiB (2 instances)
+  L3 cache:                                32 MiB (1 instance)
+mem_total: 16377436 kB
+tools:
+  c++: c++ (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0
+  cmake: cmake version 3.28.3
+  ninja: 1.11.1
+  riscv-gcc: riscv64-unknown-elf-gcc (13.2.0-11ubuntu1+12) 13.2.0
+  riscv-binutils: GNU assembler (2.42-1ubuntu1+6) 2.42
+  clang: Ubuntu clang version 18.1.3 (1ubuntu1)
+  python3: Python 3.12.3
+  verilator: Verilator 5.020 2024-01-01 rev (Debian 5.020-1)
+
+| step | wall time | result |
+|---|---:|---|
+| asan configure+build | 53 s | pass |
+| asan ctest (all labels except workloads) | 21 s | pass |
+| release configure+build | 34 s | pass |
+| release ctest (workloads) | 22 s | pass |
+| release RTL correlation, seeds 1-100 | 2 s | pass |
+
+total wall time: 132 s

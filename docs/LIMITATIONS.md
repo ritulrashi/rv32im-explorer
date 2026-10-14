@@ -44,7 +44,7 @@ What this project does **not** model or verify. Updated every phase.
 - **Cold caches at the start of the region of interest.** The ROI-marker store allocates one D-cache line (on its own line, so it evicts no workload data), and the marker store that ends the ROI is counted inside it.
 - **C kernels are compiled freestanding with `-fno-builtin`**, so clang cannot call `memset`/`memcpy`. One clang version (recorded in provenance); other versions or GCC may generate different code.
 - **No timing noise:** the model is deterministic, so each result is one run. Error bars would be meaningless here. They would matter on hardware.
-- **ROI edges: event counts can be off by a few.** The ROI snapshot is taken when a marker store retires in WB. Younger instructions already in flight may have made their cache accesses in that same cycle, so those events land on the other side of the boundary from the stall cycles they cause. Example: 255 instead of 256 D-misses for the dot product on `big` (RESULTS.md §7). Cycle counts and CPI stacks are exact.
+- **ROI edges: event counts can be off by a few.** The ROI snapshot is taken when a marker store retires in WB. Younger instructions already in flight may have made their cache accesses in that same cycle, so those events land on the other side of the boundary from the stall cycles they cause. Example: 255 instead of 256 D-misses for the dot product on `big` (RESULTS.md §8). Cycle counts and CPI stacks are exact.
 
 ## RTL and correlation (Phase 5)
 - **RV32I only:** the RTL has no MUL/DIV (as specified), so the contract's MUL/DIV timing (P2 §6.4), the rv32um tests and the Phase 4 workloads are not correlated against RTL.

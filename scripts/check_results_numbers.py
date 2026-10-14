@@ -13,6 +13,7 @@ with fewer digits than the generated file only if it is a prefix of a
 generated value with the same integer part (e.g. "1.71" from "1.714") - no
 rounding is allowed, only truncation that keeps the printed digits exact.
 """
+import csv
 import re
 import sys
 
@@ -30,10 +31,20 @@ def main():
     # Section numbers in Markdown headings ("### 5.2 The fix") likewise.
     text = re.sub(r"(?m)^(#+\s+)\d+(?:\.\d+)*", r"\1", text)
     corpus = ""
+    csv_fields = []
     for g in gens:
         with open(g, encoding="utf-8") as f:
-            corpus += f.read() + "\n"
+            if g.endswith(".csv"):
+                csv_fields += [v for row in csv.reader(f) for v in row]
+            else:
+                corpus += f.read() + "\n"
     generated = set(TOKEN.findall(corpus))
+    # CSV files store plain integers ("315393"); a document may quote them with
+    # thousands separators ("315,393"). Accept exactly that reformatting. CSV
+    # fields are taken whole (a regex over the raw text would see the field
+    # separators as thousands separators).
+    generated |= {f"{int(v):,}" for v in csv_fields if v.isdigit()}
+    generated |= {v for v in csv_fields if re.fullmatch(r"\d+\.\d+", v)}
     missing = []
     for tok in sorted(set(TOKEN.findall(text))):
         if tok in generated:

@@ -8,15 +8,18 @@
   experiments in §5, with every simulator command line
 - [`raw.csv`](results/phase4/raw.csv): one row per (workload, config); the JSON
   for each run is under `stats/`
+- §7 only: the Phase 6 sweep CSVs in
+  [`results/phase6/sweeps/`](results/phase6/sweeps/)
 
-`scripts/check_results_numbers.py` checks that every multi-digit or decimal
-number below appears verbatim in those files. Small integers are parameters
-(N=64, T=8, "2 cycles"), not measurements.
+`scripts/check_results.sh` checks that every multi-digit or decimal number
+below appears verbatim in those files (CSV integers may be quoted with
+thousands separators). Small integers are parameters (N=64, T=8, "2
+cycles"), not measurements.
 
 | | |
 |---|---|
 | Measured on | The commit, tree state and machine of the committed run are in [`run_summary.txt`](results/phase4/run_summary.txt): a clean tree in a GitHub Codespace (AMD EPYC 7763, 4 vCPU, Ubuntu 24.04.3), clang 18.1.3, riscv64-unknown-elf-gcc 13.2.0. The analysis was first written against a run at commit `053945e`; the committed run repeats it at a later commit. Only scripts and docs changed in between, and the numbers are identical. |
-| Reproduce | `scripts/phase4_run.sh` (about 108 s on that machine), then `scripts/check_results_numbers.py RESULTS.md results/phase4/*.md results/phase4/raw.csv` |
+| Reproduce | `scripts/phase4_run.sh` (about 108 s on that machine) and, for §7, `scripts/phase6_exit.sh`; then `scripts/check_results.sh` |
 | Validity | 150 of 150 runs (30 workloads × 5 configs): each workload passed its own result check (checksum against an independent Python reference) **and** agreed with the golden ISS in lockstep. 5 of 5 determinism re-runs were byte-identical. |
 | Scope | All figures are for the **region of interest** (the kernel only; setup and result checking excluded), on a model, not on hardware. See [LIMITATIONS](docs/LIMITATIONS.md). |
 
@@ -293,7 +296,52 @@ for every (i, j). C -O3 tiled is also 1.64× faster than C -O3 naive on
 ideal memory. Unrolling, not tiling, is the reason: it executes 5.06 rather
 than 7.14 instructions per MAC.
 
-## 7. Caveats specific to these numbers
+## 7. Sweeps (Phase 6): the open questions from §5, answered
+
+From `scripts/sweep.py` runs: [`results/phase6/sweeps/`](results/phase6/sweeps/)
+(CSV, provenance and every command), plotted in
+[`results/phase6/PLOTS.md`](results/phase6/PLOTS.md).
+
+**Is bimodal's loss on `asm-gemm_tiled_unroll4-n32` (§5.3) a small-table
+effect? No.** With no BTB and ideal memory:
+- bimodal mispredicts 8,794 of 12,884 conditional branches with 16 entries,
+  and the same 8,794 with 4,096 entries
+- static not-taken mispredicts 8,191
+- gshare with 2 bits of history mispredicts 605 at both sizes
+
+These kernels have so few static branches that 16 entries never alias. The
+predictor's *algorithm* is the problem: a 2-bit counter on an alternating
+branch. Capacity has nothing to do with it.
+
+**Does associativity alone fix tiled GEMM's conflict misses (§5.1)? No, and
+at fixed capacity more ways can make it *worse*.** For `asm-gemm_tiled-n64`
+with a 2 KiB D-cache:
+
+| assoc | D-misses | ROI cycles |
+|---|---:|---:|
+| 1-way | 96,513 | 6,651,234 |
+| 2-way | 133,889 | 7,762,366 |
+| 4-way | 209,409 | 9,355,886 |
+| 8-way | 305,921 | 11,415,470 |
+
+- **Why:** at fixed capacity, more ways means fewer sets. A 2 KiB, 8-way
+  cache with 16 B lines has 16 sets, so set indices repeat every 256 bytes,
+  exactly the row stride of a 64-wide int32 matrix. Every element of a B
+  column lands in the same set.
+- **At 1 KiB, 8-way is only marginally better than 2-way** (311,297 vs
+  315,393 misses).
+- **Padding is what fixes it.** `c-O3-gemm_tiled_pad-n64` takes 25,079
+  misses at 2-way and 20,275 at 8-way.
+
+**The direct-mapped dot product misses on every access below 8 KiB.**
+- **Direct-mapped, 4 KiB:** `asm-dot_naive-n1024` misses all 2,048 of its
+  2,048 accesses (55,571 cycles). `vec_a` and `vec_b` are both 4 KiB-aligned,
+  so `a[i]` and `b[i]` map to the same line and evict each other on every
+  access.
+- **2-way at 4 KiB, or direct-mapped at 8 KiB:** misses drop to 512 (21,779
+  cycles), one compulsory miss per 16-byte line.
+
+## 8. Caveats specific to these numbers
 
 - **Small error in event counts at the ROI edges.** The begin-marker store
   retires in WB while the first kernel load is already in MEM, so that load's

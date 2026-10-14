@@ -1,0 +1,192 @@
+build/release/rvsim-pipe build/release/workloads/asm-dot_naive-n1024.elf --config configs/baseline.cfg --set bpred.type=static_nt --set btb.entries=0 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-dot_naive-n1024.elf --config configs/baseline.cfg --set bpred.type=static_nt --set btb.entries=64 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-dot_naive-n1024.elf --config configs/baseline.cfg --set bpred.type=bimodal --set bpred.entries=16 --set btb.entries=0 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-dot_naive-n1024.elf --config configs/baseline.cfg --set bpred.type=bimodal --set bpred.entries=16 --set btb.entries=64 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-dot_naive-n1024.elf --config configs/baseline.cfg --set bpred.type=bimodal --set bpred.entries=64 --set btb.entries=0 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-dot_naive-n1024.elf --config configs/baseline.cfg --set bpred.type=bimodal --set bpred.entries=64 --set btb.entries=64 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-dot_naive-n1024.elf --config configs/baseline.cfg --set bpred.type=bimodal --set bpred.entries=256 --set btb.entries=0 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-dot_naive-n1024.elf --config configs/baseline.cfg --set bpred.type=bimodal --set bpred.entries=256 --set btb.entries=64 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-dot_naive-n1024.elf --config configs/baseline.cfg --set bpred.type=bimodal --set bpred.entries=1024 --set btb.entries=0 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-dot_naive-n1024.elf --config configs/baseline.cfg --set bpred.type=bimodal --set bpred.entries=1024 --set btb.entries=64 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-dot_naive-n1024.elf --config configs/baseline.cfg --set bpred.type=bimodal --set bpred.entries=4096 --set btb.entries=0 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-dot_naive-n1024.elf --config configs/baseline.cfg --set bpred.type=bimodal --set bpred.entries=4096 --set btb.entries=64 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-dot_naive-n1024.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=16 --set bpred.history_bits=2 --set btb.entries=0 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-dot_naive-n1024.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=16 --set bpred.history_bits=2 --set btb.entries=64 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-dot_naive-n1024.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=16 --set bpred.history_bits=4 --set btb.entries=0 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-dot_naive-n1024.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=16 --set bpred.history_bits=4 --set btb.entries=64 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-dot_naive-n1024.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=64 --set bpred.history_bits=2 --set btb.entries=0 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-dot_naive-n1024.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=64 --set bpred.history_bits=2 --set btb.entries=64 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-dot_naive-n1024.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=64 --set bpred.history_bits=4 --set btb.entries=0 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-dot_naive-n1024.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=64 --set bpred.history_bits=4 --set btb.entries=64 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-dot_naive-n1024.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=256 --set bpred.history_bits=2 --set btb.entries=0 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-dot_naive-n1024.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=256 --set bpred.history_bits=2 --set btb.entries=64 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-dot_naive-n1024.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=256 --set bpred.history_bits=4 --set btb.entries=0 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-dot_naive-n1024.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=256 --set bpred.history_bits=4 --set btb.entries=64 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-dot_naive-n1024.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=1024 --set bpred.history_bits=2 --set btb.entries=0 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-dot_naive-n1024.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=1024 --set bpred.history_bits=2 --set btb.entries=64 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-dot_naive-n1024.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=1024 --set bpred.history_bits=4 --set btb.entries=0 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-dot_naive-n1024.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=1024 --set bpred.history_bits=4 --set btb.entries=64 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-dot_naive-n1024.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=4096 --set bpred.history_bits=2 --set btb.entries=0 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-dot_naive-n1024.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=4096 --set bpred.history_bits=2 --set btb.entries=64 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-dot_naive-n1024.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=4096 --set bpred.history_bits=4 --set btb.entries=0 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-dot_naive-n1024.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=4096 --set bpred.history_bits=4 --set btb.entries=64 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-gemm_naive-n32.elf --config configs/baseline.cfg --set bpred.type=static_nt --set btb.entries=0 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-gemm_naive-n32.elf --config configs/baseline.cfg --set bpred.type=static_nt --set btb.entries=64 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-gemm_naive-n32.elf --config configs/baseline.cfg --set bpred.type=bimodal --set bpred.entries=16 --set btb.entries=0 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-gemm_naive-n32.elf --config configs/baseline.cfg --set bpred.type=bimodal --set bpred.entries=16 --set btb.entries=64 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-gemm_naive-n32.elf --config configs/baseline.cfg --set bpred.type=bimodal --set bpred.entries=64 --set btb.entries=0 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-gemm_naive-n32.elf --config configs/baseline.cfg --set bpred.type=bimodal --set bpred.entries=64 --set btb.entries=64 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-gemm_naive-n32.elf --config configs/baseline.cfg --set bpred.type=bimodal --set bpred.entries=256 --set btb.entries=0 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-gemm_naive-n32.elf --config configs/baseline.cfg --set bpred.type=bimodal --set bpred.entries=256 --set btb.entries=64 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-gemm_naive-n32.elf --config configs/baseline.cfg --set bpred.type=bimodal --set bpred.entries=1024 --set btb.entries=0 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-gemm_naive-n32.elf --config configs/baseline.cfg --set bpred.type=bimodal --set bpred.entries=1024 --set btb.entries=64 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-gemm_naive-n32.elf --config configs/baseline.cfg --set bpred.type=bimodal --set bpred.entries=4096 --set btb.entries=0 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-gemm_naive-n32.elf --config configs/baseline.cfg --set bpred.type=bimodal --set bpred.entries=4096 --set btb.entries=64 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-gemm_naive-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=16 --set bpred.history_bits=2 --set btb.entries=0 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-gemm_naive-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=16 --set bpred.history_bits=2 --set btb.entries=64 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-gemm_naive-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=16 --set bpred.history_bits=4 --set btb.entries=0 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-gemm_naive-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=16 --set bpred.history_bits=4 --set btb.entries=64 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-gemm_naive-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=64 --set bpred.history_bits=2 --set btb.entries=0 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-gemm_naive-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=64 --set bpred.history_bits=2 --set btb.entries=64 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-gemm_naive-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=64 --set bpred.history_bits=4 --set btb.entries=0 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-gemm_naive-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=64 --set bpred.history_bits=4 --set btb.entries=64 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-gemm_naive-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=256 --set bpred.history_bits=2 --set btb.entries=0 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-gemm_naive-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=256 --set bpred.history_bits=2 --set btb.entries=64 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-gemm_naive-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=256 --set bpred.history_bits=4 --set btb.entries=0 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-gemm_naive-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=256 --set bpred.history_bits=4 --set btb.entries=64 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-gemm_naive-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=1024 --set bpred.history_bits=2 --set btb.entries=0 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-gemm_naive-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=1024 --set bpred.history_bits=2 --set btb.entries=64 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-gemm_naive-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=1024 --set bpred.history_bits=4 --set btb.entries=0 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-gemm_naive-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=1024 --set bpred.history_bits=4 --set btb.entries=64 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-gemm_naive-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=4096 --set bpred.history_bits=2 --set btb.entries=0 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-gemm_naive-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=4096 --set bpred.history_bits=2 --set btb.entries=64 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-gemm_naive-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=4096 --set bpred.history_bits=4 --set btb.entries=0 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-gemm_naive-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=4096 --set bpred.history_bits=4 --set btb.entries=64 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-gemm_tiled-n32.elf --config configs/baseline.cfg --set bpred.type=static_nt --set btb.entries=0 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-gemm_tiled-n32.elf --config configs/baseline.cfg --set bpred.type=static_nt --set btb.entries=64 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-gemm_tiled-n32.elf --config configs/baseline.cfg --set bpred.type=bimodal --set bpred.entries=16 --set btb.entries=0 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-gemm_tiled-n32.elf --config configs/baseline.cfg --set bpred.type=bimodal --set bpred.entries=16 --set btb.entries=64 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-gemm_tiled-n32.elf --config configs/baseline.cfg --set bpred.type=bimodal --set bpred.entries=64 --set btb.entries=0 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-gemm_tiled-n32.elf --config configs/baseline.cfg --set bpred.type=bimodal --set bpred.entries=64 --set btb.entries=64 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-gemm_tiled-n32.elf --config configs/baseline.cfg --set bpred.type=bimodal --set bpred.entries=256 --set btb.entries=0 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-gemm_tiled-n32.elf --config configs/baseline.cfg --set bpred.type=bimodal --set bpred.entries=256 --set btb.entries=64 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-gemm_tiled-n32.elf --config configs/baseline.cfg --set bpred.type=bimodal --set bpred.entries=1024 --set btb.entries=0 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-gemm_tiled-n32.elf --config configs/baseline.cfg --set bpred.type=bimodal --set bpred.entries=1024 --set btb.entries=64 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-gemm_tiled-n32.elf --config configs/baseline.cfg --set bpred.type=bimodal --set bpred.entries=4096 --set btb.entries=0 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-gemm_tiled-n32.elf --config configs/baseline.cfg --set bpred.type=bimodal --set bpred.entries=4096 --set btb.entries=64 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-gemm_tiled-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=16 --set bpred.history_bits=2 --set btb.entries=0 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-gemm_tiled-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=16 --set bpred.history_bits=2 --set btb.entries=64 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-gemm_tiled-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=16 --set bpred.history_bits=4 --set btb.entries=0 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-gemm_tiled-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=16 --set bpred.history_bits=4 --set btb.entries=64 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-gemm_tiled-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=64 --set bpred.history_bits=2 --set btb.entries=0 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-gemm_tiled-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=64 --set bpred.history_bits=2 --set btb.entries=64 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-gemm_tiled-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=64 --set bpred.history_bits=4 --set btb.entries=0 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-gemm_tiled-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=64 --set bpred.history_bits=4 --set btb.entries=64 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-gemm_tiled-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=256 --set bpred.history_bits=2 --set btb.entries=0 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-gemm_tiled-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=256 --set bpred.history_bits=2 --set btb.entries=64 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-gemm_tiled-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=256 --set bpred.history_bits=4 --set btb.entries=0 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-gemm_tiled-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=256 --set bpred.history_bits=4 --set btb.entries=64 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-gemm_tiled-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=1024 --set bpred.history_bits=2 --set btb.entries=0 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-gemm_tiled-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=1024 --set bpred.history_bits=2 --set btb.entries=64 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-gemm_tiled-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=1024 --set bpred.history_bits=4 --set btb.entries=0 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-gemm_tiled-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=1024 --set bpred.history_bits=4 --set btb.entries=64 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-gemm_tiled-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=4096 --set bpred.history_bits=2 --set btb.entries=0 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-gemm_tiled-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=4096 --set bpred.history_bits=2 --set btb.entries=64 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-gemm_tiled-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=4096 --set bpred.history_bits=4 --set btb.entries=0 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-gemm_tiled-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=4096 --set bpred.history_bits=4 --set btb.entries=64 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-gemm_tiled_unroll4-n32.elf --config configs/baseline.cfg --set bpred.type=static_nt --set btb.entries=0 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-gemm_tiled_unroll4-n32.elf --config configs/baseline.cfg --set bpred.type=static_nt --set btb.entries=64 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-gemm_tiled_unroll4-n32.elf --config configs/baseline.cfg --set bpred.type=bimodal --set bpred.entries=16 --set btb.entries=0 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-gemm_tiled_unroll4-n32.elf --config configs/baseline.cfg --set bpred.type=bimodal --set bpred.entries=16 --set btb.entries=64 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-gemm_tiled_unroll4-n32.elf --config configs/baseline.cfg --set bpred.type=bimodal --set bpred.entries=64 --set btb.entries=0 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-gemm_tiled_unroll4-n32.elf --config configs/baseline.cfg --set bpred.type=bimodal --set bpred.entries=64 --set btb.entries=64 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-gemm_tiled_unroll4-n32.elf --config configs/baseline.cfg --set bpred.type=bimodal --set bpred.entries=256 --set btb.entries=0 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-gemm_tiled_unroll4-n32.elf --config configs/baseline.cfg --set bpred.type=bimodal --set bpred.entries=256 --set btb.entries=64 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-gemm_tiled_unroll4-n32.elf --config configs/baseline.cfg --set bpred.type=bimodal --set bpred.entries=1024 --set btb.entries=0 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-gemm_tiled_unroll4-n32.elf --config configs/baseline.cfg --set bpred.type=bimodal --set bpred.entries=1024 --set btb.entries=64 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-gemm_tiled_unroll4-n32.elf --config configs/baseline.cfg --set bpred.type=bimodal --set bpred.entries=4096 --set btb.entries=0 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-gemm_tiled_unroll4-n32.elf --config configs/baseline.cfg --set bpred.type=bimodal --set bpred.entries=4096 --set btb.entries=64 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-gemm_tiled_unroll4-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=16 --set bpred.history_bits=2 --set btb.entries=0 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-gemm_tiled_unroll4-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=16 --set bpred.history_bits=2 --set btb.entries=64 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-gemm_tiled_unroll4-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=16 --set bpred.history_bits=4 --set btb.entries=0 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-gemm_tiled_unroll4-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=16 --set bpred.history_bits=4 --set btb.entries=64 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-gemm_tiled_unroll4-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=64 --set bpred.history_bits=2 --set btb.entries=0 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-gemm_tiled_unroll4-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=64 --set bpred.history_bits=2 --set btb.entries=64 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-gemm_tiled_unroll4-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=64 --set bpred.history_bits=4 --set btb.entries=0 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-gemm_tiled_unroll4-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=64 --set bpred.history_bits=4 --set btb.entries=64 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-gemm_tiled_unroll4-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=256 --set bpred.history_bits=2 --set btb.entries=0 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-gemm_tiled_unroll4-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=256 --set bpred.history_bits=2 --set btb.entries=64 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-gemm_tiled_unroll4-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=256 --set bpred.history_bits=4 --set btb.entries=0 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-gemm_tiled_unroll4-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=256 --set bpred.history_bits=4 --set btb.entries=64 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-gemm_tiled_unroll4-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=1024 --set bpred.history_bits=2 --set btb.entries=0 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-gemm_tiled_unroll4-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=1024 --set bpred.history_bits=2 --set btb.entries=64 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-gemm_tiled_unroll4-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=1024 --set bpred.history_bits=4 --set btb.entries=0 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-gemm_tiled_unroll4-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=1024 --set bpred.history_bits=4 --set btb.entries=64 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-gemm_tiled_unroll4-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=4096 --set bpred.history_bits=2 --set btb.entries=0 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-gemm_tiled_unroll4-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=4096 --set bpred.history_bits=2 --set btb.entries=64 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-gemm_tiled_unroll4-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=4096 --set bpred.history_bits=4 --set btb.entries=0 --stats -
+build/release/rvsim-pipe build/release/workloads/asm-gemm_tiled_unroll4-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=4096 --set bpred.history_bits=4 --set btb.entries=64 --stats -
+build/release/rvsim-pipe build/release/workloads/c-O0-gemm_naive-n32.elf --config configs/baseline.cfg --set bpred.type=static_nt --set btb.entries=0 --stats -
+build/release/rvsim-pipe build/release/workloads/c-O0-gemm_naive-n32.elf --config configs/baseline.cfg --set bpred.type=static_nt --set btb.entries=64 --stats -
+build/release/rvsim-pipe build/release/workloads/c-O0-gemm_naive-n32.elf --config configs/baseline.cfg --set bpred.type=bimodal --set bpred.entries=16 --set btb.entries=0 --stats -
+build/release/rvsim-pipe build/release/workloads/c-O0-gemm_naive-n32.elf --config configs/baseline.cfg --set bpred.type=bimodal --set bpred.entries=16 --set btb.entries=64 --stats -
+build/release/rvsim-pipe build/release/workloads/c-O0-gemm_naive-n32.elf --config configs/baseline.cfg --set bpred.type=bimodal --set bpred.entries=64 --set btb.entries=0 --stats -
+build/release/rvsim-pipe build/release/workloads/c-O0-gemm_naive-n32.elf --config configs/baseline.cfg --set bpred.type=bimodal --set bpred.entries=64 --set btb.entries=64 --stats -
+build/release/rvsim-pipe build/release/workloads/c-O0-gemm_naive-n32.elf --config configs/baseline.cfg --set bpred.type=bimodal --set bpred.entries=256 --set btb.entries=0 --stats -
+build/release/rvsim-pipe build/release/workloads/c-O0-gemm_naive-n32.elf --config configs/baseline.cfg --set bpred.type=bimodal --set bpred.entries=256 --set btb.entries=64 --stats -
+build/release/rvsim-pipe build/release/workloads/c-O0-gemm_naive-n32.elf --config configs/baseline.cfg --set bpred.type=bimodal --set bpred.entries=1024 --set btb.entries=0 --stats -
+build/release/rvsim-pipe build/release/workloads/c-O0-gemm_naive-n32.elf --config configs/baseline.cfg --set bpred.type=bimodal --set bpred.entries=1024 --set btb.entries=64 --stats -
+build/release/rvsim-pipe build/release/workloads/c-O0-gemm_naive-n32.elf --config configs/baseline.cfg --set bpred.type=bimodal --set bpred.entries=4096 --set btb.entries=0 --stats -
+build/release/rvsim-pipe build/release/workloads/c-O0-gemm_naive-n32.elf --config configs/baseline.cfg --set bpred.type=bimodal --set bpred.entries=4096 --set btb.entries=64 --stats -
+build/release/rvsim-pipe build/release/workloads/c-O0-gemm_naive-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=16 --set bpred.history_bits=2 --set btb.entries=0 --stats -
+build/release/rvsim-pipe build/release/workloads/c-O0-gemm_naive-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=16 --set bpred.history_bits=2 --set btb.entries=64 --stats -
+build/release/rvsim-pipe build/release/workloads/c-O0-gemm_naive-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=16 --set bpred.history_bits=4 --set btb.entries=0 --stats -
+build/release/rvsim-pipe build/release/workloads/c-O0-gemm_naive-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=16 --set bpred.history_bits=4 --set btb.entries=64 --stats -
+build/release/rvsim-pipe build/release/workloads/c-O0-gemm_naive-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=64 --set bpred.history_bits=2 --set btb.entries=0 --stats -
+build/release/rvsim-pipe build/release/workloads/c-O0-gemm_naive-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=64 --set bpred.history_bits=2 --set btb.entries=64 --stats -
+build/release/rvsim-pipe build/release/workloads/c-O0-gemm_naive-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=64 --set bpred.history_bits=4 --set btb.entries=0 --stats -
+build/release/rvsim-pipe build/release/workloads/c-O0-gemm_naive-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=64 --set bpred.history_bits=4 --set btb.entries=64 --stats -
+build/release/rvsim-pipe build/release/workloads/c-O0-gemm_naive-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=256 --set bpred.history_bits=2 --set btb.entries=0 --stats -
+build/release/rvsim-pipe build/release/workloads/c-O0-gemm_naive-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=256 --set bpred.history_bits=2 --set btb.entries=64 --stats -
+build/release/rvsim-pipe build/release/workloads/c-O0-gemm_naive-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=256 --set bpred.history_bits=4 --set btb.entries=0 --stats -
+build/release/rvsim-pipe build/release/workloads/c-O0-gemm_naive-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=256 --set bpred.history_bits=4 --set btb.entries=64 --stats -
+build/release/rvsim-pipe build/release/workloads/c-O0-gemm_naive-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=1024 --set bpred.history_bits=2 --set btb.entries=0 --stats -
+build/release/rvsim-pipe build/release/workloads/c-O0-gemm_naive-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=1024 --set bpred.history_bits=2 --set btb.entries=64 --stats -
+build/release/rvsim-pipe build/release/workloads/c-O0-gemm_naive-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=1024 --set bpred.history_bits=4 --set btb.entries=0 --stats -
+build/release/rvsim-pipe build/release/workloads/c-O0-gemm_naive-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=1024 --set bpred.history_bits=4 --set btb.entries=64 --stats -
+build/release/rvsim-pipe build/release/workloads/c-O0-gemm_naive-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=4096 --set bpred.history_bits=2 --set btb.entries=0 --stats -
+build/release/rvsim-pipe build/release/workloads/c-O0-gemm_naive-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=4096 --set bpred.history_bits=2 --set btb.entries=64 --stats -
+build/release/rvsim-pipe build/release/workloads/c-O0-gemm_naive-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=4096 --set bpred.history_bits=4 --set btb.entries=0 --stats -
+build/release/rvsim-pipe build/release/workloads/c-O0-gemm_naive-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=4096 --set bpred.history_bits=4 --set btb.entries=64 --stats -
+build/release/rvsim-pipe build/release/workloads/c-O3-gemm_tiled-n32.elf --config configs/baseline.cfg --set bpred.type=static_nt --set btb.entries=0 --stats -
+build/release/rvsim-pipe build/release/workloads/c-O3-gemm_tiled-n32.elf --config configs/baseline.cfg --set bpred.type=static_nt --set btb.entries=64 --stats -
+build/release/rvsim-pipe build/release/workloads/c-O3-gemm_tiled-n32.elf --config configs/baseline.cfg --set bpred.type=bimodal --set bpred.entries=16 --set btb.entries=0 --stats -
+build/release/rvsim-pipe build/release/workloads/c-O3-gemm_tiled-n32.elf --config configs/baseline.cfg --set bpred.type=bimodal --set bpred.entries=16 --set btb.entries=64 --stats -
+build/release/rvsim-pipe build/release/workloads/c-O3-gemm_tiled-n32.elf --config configs/baseline.cfg --set bpred.type=bimodal --set bpred.entries=64 --set btb.entries=0 --stats -
+build/release/rvsim-pipe build/release/workloads/c-O3-gemm_tiled-n32.elf --config configs/baseline.cfg --set bpred.type=bimodal --set bpred.entries=64 --set btb.entries=64 --stats -
+build/release/rvsim-pipe build/release/workloads/c-O3-gemm_tiled-n32.elf --config configs/baseline.cfg --set bpred.type=bimodal --set bpred.entries=256 --set btb.entries=0 --stats -
+build/release/rvsim-pipe build/release/workloads/c-O3-gemm_tiled-n32.elf --config configs/baseline.cfg --set bpred.type=bimodal --set bpred.entries=256 --set btb.entries=64 --stats -
+build/release/rvsim-pipe build/release/workloads/c-O3-gemm_tiled-n32.elf --config configs/baseline.cfg --set bpred.type=bimodal --set bpred.entries=1024 --set btb.entries=0 --stats -
+build/release/rvsim-pipe build/release/workloads/c-O3-gemm_tiled-n32.elf --config configs/baseline.cfg --set bpred.type=bimodal --set bpred.entries=1024 --set btb.entries=64 --stats -
+build/release/rvsim-pipe build/release/workloads/c-O3-gemm_tiled-n32.elf --config configs/baseline.cfg --set bpred.type=bimodal --set bpred.entries=4096 --set btb.entries=0 --stats -
+build/release/rvsim-pipe build/release/workloads/c-O3-gemm_tiled-n32.elf --config configs/baseline.cfg --set bpred.type=bimodal --set bpred.entries=4096 --set btb.entries=64 --stats -
+build/release/rvsim-pipe build/release/workloads/c-O3-gemm_tiled-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=16 --set bpred.history_bits=2 --set btb.entries=0 --stats -
+build/release/rvsim-pipe build/release/workloads/c-O3-gemm_tiled-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=16 --set bpred.history_bits=2 --set btb.entries=64 --stats -
+build/release/rvsim-pipe build/release/workloads/c-O3-gemm_tiled-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=16 --set bpred.history_bits=4 --set btb.entries=0 --stats -
+build/release/rvsim-pipe build/release/workloads/c-O3-gemm_tiled-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=16 --set bpred.history_bits=4 --set btb.entries=64 --stats -
+build/release/rvsim-pipe build/release/workloads/c-O3-gemm_tiled-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=64 --set bpred.history_bits=2 --set btb.entries=0 --stats -
+build/release/rvsim-pipe build/release/workloads/c-O3-gemm_tiled-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=64 --set bpred.history_bits=2 --set btb.entries=64 --stats -
+build/release/rvsim-pipe build/release/workloads/c-O3-gemm_tiled-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=64 --set bpred.history_bits=4 --set btb.entries=0 --stats -
+build/release/rvsim-pipe build/release/workloads/c-O3-gemm_tiled-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=64 --set bpred.history_bits=4 --set btb.entries=64 --stats -
+build/release/rvsim-pipe build/release/workloads/c-O3-gemm_tiled-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=256 --set bpred.history_bits=2 --set btb.entries=0 --stats -
+build/release/rvsim-pipe build/release/workloads/c-O3-gemm_tiled-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=256 --set bpred.history_bits=2 --set btb.entries=64 --stats -
+build/release/rvsim-pipe build/release/workloads/c-O3-gemm_tiled-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=256 --set bpred.history_bits=4 --set btb.entries=0 --stats -
+build/release/rvsim-pipe build/release/workloads/c-O3-gemm_tiled-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=256 --set bpred.history_bits=4 --set btb.entries=64 --stats -
+build/release/rvsim-pipe build/release/workloads/c-O3-gemm_tiled-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=1024 --set bpred.history_bits=2 --set btb.entries=0 --stats -
+build/release/rvsim-pipe build/release/workloads/c-O3-gemm_tiled-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=1024 --set bpred.history_bits=2 --set btb.entries=64 --stats -
+build/release/rvsim-pipe build/release/workloads/c-O3-gemm_tiled-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=1024 --set bpred.history_bits=4 --set btb.entries=0 --stats -
+build/release/rvsim-pipe build/release/workloads/c-O3-gemm_tiled-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=1024 --set bpred.history_bits=4 --set btb.entries=64 --stats -
+build/release/rvsim-pipe build/release/workloads/c-O3-gemm_tiled-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=4096 --set bpred.history_bits=2 --set btb.entries=0 --stats -
+build/release/rvsim-pipe build/release/workloads/c-O3-gemm_tiled-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=4096 --set bpred.history_bits=2 --set btb.entries=64 --stats -
+build/release/rvsim-pipe build/release/workloads/c-O3-gemm_tiled-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=4096 --set bpred.history_bits=4 --set btb.entries=0 --stats -
+build/release/rvsim-pipe build/release/workloads/c-O3-gemm_tiled-n32.elf --config configs/baseline.cfg --set bpred.type=gshare --set bpred.entries=4096 --set bpred.history_bits=4 --set btb.entries=64 --stats -

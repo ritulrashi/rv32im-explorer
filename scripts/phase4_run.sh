@@ -77,9 +77,9 @@ elapsed=$(( $(date +%s) - start ))
 python3 scripts/phase4_tables.py "$out" "$b/workloads" > /dev/null
 python3 scripts/phase4_investigations.py "$b" "$out/investigations.md" > /dev/null
 # Rule 1: every measurement quoted in RESULTS.md must appear in a generated file.
+# (Checks against Phase 4 and, if present, Phase 6 sweep results.)
 if [ -f RESULTS.md ]; then
-  python3 scripts/check_results_numbers.py RESULTS.md "$out/tables.md" "$out/investigations.md" \
-    "$out/raw.csv" "$out/run_summary.txt" > "$out/results_check.txt" 2>&1 || true
+  bash scripts/check_results.sh > "$out/results_check.txt" 2>&1 || true
   cat "$out/results_check.txt"
 fi
 cat "$out/run_summary.txt"

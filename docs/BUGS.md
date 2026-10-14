@@ -18,6 +18,8 @@ Every bug found and fixed, with how it was detected.
 
 | 7 | 6 | `scripts/phase6_exit.sh` (result provenance) | All three sweep provenance files from the first official Phase 6 run said `tree: DIRTY`, although the checkout was clean at commit a6ed84a | The same class as bug #2. Each sweep records `env_report` when it starts, but the script wrote earlier outputs (the regression timing, earlier sweeps) straight into `results/phase6`, so each later step saw untracked files. Fix: write everything to a temporary directory outside the repo and move it into `results/phase6` at the end. | Checking the `tree:` line of every provenance file before committing results | see git log: "Phase 6" |
 
+| 8 | 6 | `scripts/check_results_numbers.py` (rule-1 checker) | After §7 was added, the checker reported 12 of 99 RESULTS.md numbers missing (for example 96,513), although each one is in `results/phase6/sweeps/dcache.csv` | The new rule that accepts plain CSV integers quoted with thousands separators used a regex that refused digits next to a comma, but in a CSV every field sits next to a comma. One §7 number had passed only because it also appears in a Phase 4 file. Fix: read CSV files with the `csv` module and compare whole fields. Negative control: changing 96,513 to 96,514 in a copy of RESULTS.md is reported as missing. | Running `scripts/check_results.sh` against the official results before committing them | see git log: "Phase 6 results" |
+
 ## Notes on bug #1
 
 - Fix: spin loops in `RVTEST_PASS`/`RVTEST_FAIL` now use `j .` (no label). The env now defines no numeric labels beyond upstream's single `1:` in `RVTEST_FAIL`. A comment in the header warns about this.
