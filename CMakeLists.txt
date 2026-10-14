@@ -70,6 +70,9 @@ add_executable(rvgen tools/rvgen.cpp)
 target_include_directories(rvgen PRIVATE src)
 target_compile_options(rvgen PRIVATE ${RVX_WARNINGS})
 
+# Phase 5 RTL (Verilator); before tests, which refer to rvsim-rtl.
+add_subdirectory(rtl)
+
 if(RVX_BUILD_TESTS)
   enable_testing()
   add_subdirectory(tests)

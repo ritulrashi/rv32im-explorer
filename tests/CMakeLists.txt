@@ -147,6 +147,39 @@ add_test(NAME cpi-sum
          COMMAND python3 ${PROJECT_SOURCE_DIR}/scripts/check_cpi_sum.py ${CMAKE_BINARY_DIR} ${RVX_CONFIG_FILES})
 set_tests_properties(cpi-sum PROPERTIES LABELS "cpi")
 
+# Phase 5: directed contract programs for RTL correlation (rv32i only).
+set(RVX_RTL_TEST_ELFS "")
+file(GLOB RVX_RTL_TEST_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/rtl/*.S)
+foreach(src ${RVX_RTL_TEST_SRCS})
+  get_filename_component(name ${src} NAME_WE)
+  set(elf ${CMAKE_CURRENT_BINARY_DIR}/rtl/${name}.elf)
+  add_custom_command(OUTPUT ${elf}
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/rtl
+    COMMAND ${RISCV_GCC} -march=rv32i_zifencei -mabi=ilp32 -static -nostdlib -nostartfiles
+            -T${CMAKE_CURRENT_SOURCE_DIR}/rtl/link0.ld ${src} -o ${elf}
+    DEPENDS ${src} ${CMAKE_CURRENT_SOURCE_DIR}/rtl/link0.ld
+    COMMENT "rtl directed: ${name}"
+    VERBATIM)
+  list(APPEND RVX_RTL_TEST_ELFS ${elf})
+endforeach()
+add_custom_target(rtl_directed_tests ALL DEPENDS ${RVX_RTL_TEST_ELFS})
+if(TARGET rvsim-rtl)
+  add_test(NAME rtl-correlate-smoke
+           COMMAND bash ${PROJECT_SOURCE_DIR}/scripts/correlate.sh ${CMAKE_BINARY_DIR}
+                   ${CMAKE_CURRENT_BINARY_DIR}/correlate-smoke 1 20)
+  set_tests_properties(rtl-correlate-smoke PROPERTIES LABELS "rtl;correlation")
+endif()
+
+# rvgen: the default (rv32im) output must stay byte-identical to what Phase 2
+# measured; the hash was recorded from rvgen at commit fa8d50f, before --isa
+# was added (seeds 1-200 concatenated).
+add_test(NAME rvgen-default-unchanged
+         COMMAND sh -c "for s in $(seq 1 200); do $<TARGET_FILE:rvgen> --seed $s; done | sha256sum | grep -q 312d739f6dc474304b880a60baed7d3bd464520ec76f9995f440f50d39f96807")
+set_tests_properties(rvgen-default-unchanged PROPERTIES LABELS determinism)
+add_test(NAME rvgen-rv32i-determinism
+         COMMAND sh -c "$<TARGET_FILE:rvgen> --seed 7 --isa rv32i > ${CMAKE_CURRENT_BINARY_DIR}/i1.S && $<TARGET_FILE:rvgen> --seed 7 --isa rv32i > ${CMAKE_CURRENT_BINARY_DIR}/i2.S && cmp ${CMAKE_CURRENT_BINARY_DIR}/i1.S ${CMAKE_CURRENT_BINARY_DIR}/i2.S && ! grep -qE '^ +(mul|div|rem)' ${CMAKE_CURRENT_BINARY_DIR}/i1.S")
+set_tests_properties(rvgen-rv32i-determinism PROPERTIES LABELS determinism)
+
 # rvgen determinism: the same seed must give byte-identical assembly.
 add_test(NAME rvgen-determinism
          COMMAND sh -c "$<TARGET_FILE:rvgen> --seed 12345 > ${CMAKE_CURRENT_BINARY_DIR}/g1.S && $<TARGET_FILE:rvgen> --seed 12345 > ${CMAKE_CURRENT_BINARY_DIR}/g2.S && cmp ${CMAKE_CURRENT_BINARY_DIR}/g1.S ${CMAKE_CURRENT_BINARY_DIR}/g2.S")

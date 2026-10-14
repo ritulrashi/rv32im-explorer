@@ -12,7 +12,7 @@ A cycle-accurate, parameterizable in-order RISC-V (RV32IM) pipeline model in C++
 | 2 | Cycle-accurate 5-stage pipeline + lockstep checker + random programs | **Done.** [results/phase2/](results/phase2/) |
 | 3 | Branch predictors, caches, DRAM model, config files, CPI stack | **Done.** [results/phase3/](results/phase3/) |
 | 4 | Assembly and clang-compiled workloads, compiler analysis, [RESULTS.md](RESULTS.md) | **Done.** [results/phase4/](results/phase4/) |
-| 5 | SystemVerilog RTL correlation | not started |
+| 5 | SystemVerilog RV32I RTL + Verilator correlation ([CORRELATION.md](docs/CORRELATION.md)) | **Done.** [results/phase5/](results/phase5/) |
 | 6 | Sweep automation, plots, CI | not started |
 
 ## Architecture
@@ -31,6 +31,8 @@ src/pipeline/      Cycle-accurate IF/ID/EX/MEM/WB pipeline, written as flops (cu
 src/bpred/         static not-taken, bimodal, gshare direction predictors; BTB (timing only)
 src/cache/         tag-only set-associative LRU caches, banked open-page DRAM model, miss penalties
 configs/           baseline (= Phase 2), bimodal_btb, gshare_btb, small_caches, big
+rtl/               SystemVerilog RV32I core implementing the Phase 2 contract (rvx_pkg.sv, rvx_core.sv)
+tb/                Verilator testbench: rvsim-rtl (same trace/diagram formats as rvsim-pipe)
 workloads/         Phase 4 kernels: asm/ (hand-written), c/ (clang -O0/-O3), common/ (runtime, ROI markers), gen_data.py
 tools/
   rvsim-iss          run a program on the ISS
@@ -43,7 +45,7 @@ tests/riscv-tests-env/  minimal test environment replacing upstream env/p
 third_party/riscv-tests official riscv-tests, pinned git submodule
 ```
 
-Design notes: [Phase 1](docs/phase1-design.md), [Phase 2 pipeline contract](docs/phase2-pipeline-contract.md) (the RTL will implement the same contract), [Phase 3 predictors/caches/CPI stack](docs/phase3-design.md). Known limits: [docs/LIMITATIONS.md](docs/LIMITATIONS.md). Bugs found and how they were detected: [docs/BUGS.md](docs/BUGS.md).
+Design notes: [Phase 1](docs/phase1-design.md), [Phase 2 pipeline contract](docs/phase2-pipeline-contract.md) (implemented by both the C++ model and the RTL), [Phase 3 predictors/caches/CPI stack](docs/phase3-design.md), [Phase 4 workloads](docs/phase4-design.md), [Phase 5 RTL correlation](docs/phase5-design.md) and its [log](docs/CORRELATION.md). Known limits: [docs/LIMITATIONS.md](docs/LIMITATIONS.md). Bugs found and how they were detected: [docs/BUGS.md](docs/BUGS.md).
 
 ## Build
 
@@ -76,6 +78,10 @@ $B/rvgen --seed 42 > prog.S                                        # one random 
 # branch/predictor, cache and DRAM counters. Integers only; ratios are left to the reader.
 $B/rvsim-pipe prog.elf --config configs/small_caches.cfg --set bpred.type=gshare --stats -
 $B/rvsim-lockstep prog.elf --config configs/big.cfg                # lockstep must hold under every config
+
+# Phase 5: the RTL core (baseline machine), same trace/diagram formats as rvsim-pipe
+$B/rvsim-rtl $B/tests/rtl/t26_diagram.elf --diagram -
+scripts/correlate.sh $B /tmp/corr 1 100       # RTL vs model: directed + rv32ui + rvgen --isa rv32i seeds 1-100
 ```
 
 Config files are `key = value` text (see [configs/](configs/) and [docs/phase3-design.md §1](docs/phase3-design.md)). Unknown keys and impossible geometries are errors. The stats JSON always echoes the fully resolved config.
@@ -98,5 +104,7 @@ Trace format (one line per retired instruction):
 | Phase 3 exit criterion (directed tests, Phase 2 regression, CPI sum, lockstep under 5 configs) | `scripts/phase3_exit.sh` | `results/phase3/exit_criterion.txt` |
 | Phase 3 sanity check (injected timing bugs are detected) | `scripts/phase3_mutation_check.sh` | `results/phase3/mutation_check.txt` |
 | Phase 4: every workload × every config, tables, investigations, and the check that every number in [RESULTS.md](RESULTS.md) is generated | `scripts/phase4_run.sh` | `results/phase4/` (`tables.md`, `investigations.md`, `raw.csv`, `stats/`, `results_check.txt`) |
+| Phase 5 exit criterion (RTL vs model at three levels on directed + rv32ui + random rv32i programs; lint) | `scripts/phase5_exit.sh` | `results/phase5/exit_criterion.txt`, `programs_*.txt` |
+| Phase 5 sanity check (injected RTL bugs are caught by correlation) | `scripts/phase5_mutation_check.sh` | `results/phase5/mutation_check.txt` |
 
 Every results file starts with the output of `scripts/env_report.sh`: commit, whether the tree was clean, submodule pin, `lscpu`, and tool versions. Run each script on a clean checkout. A script that runs after another has written a results file will correctly report the tree as dirty.

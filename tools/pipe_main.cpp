@@ -29,12 +29,17 @@ namespace {
 using namespace rvx;
 using namespace rvx::pipe;
 
+// Stable per-cycle diagram format, shared with the RTL testbench for
+// correlation (docs/phase5-design.md §1):
+//   <cycle> <IF> <ID> <EX> <MEM> <WB>
+// each field an 8-hex-digit pc or "-<bubble cause>"; IF is "-frozen" after a
+// fault flush.
 std::string stage_cell(const std::optional<uint32_t>& pc, BubbleCause cause) {
   char b[32];
   if (pc) {
     std::snprintf(b, sizeof b, "%08x", *pc);
   } else {
-    std::snprintf(b, sizeof b, "--%-6.6s", std::string(to_string(cause)).c_str());
+    std::snprintf(b, sizeof b, "-%s", std::string(to_string(cause)).c_str());
   }
   return b;
 }
@@ -104,7 +109,7 @@ int main(int argc, char** argv) {
   p.set_roi_marker(roi_marker);
   std::map<uint32_t, uint64_t> profile;  // ordered: deterministic output
   int roi_state = roi_marker ? 0 : 1;      // 0 before, 1 inside, 2 after
-  if (diag_os) *diag_os << "cycle    IF       ID       EX       MEM      WB\n";
+  if (diag_os) *diag_os << "# cycle IF ID EX MEM WB\n";
   try {
     while (!p.halted()) {
       if (p.cycles() >= max_cycles) {
@@ -124,8 +129,8 @@ int main(int argc, char** argv) {
       if (diag_os) {
         const auto& v = p.last_view();
         char c[24];
-        std::snprintf(c, sizeof c, "%-8llu ", static_cast<unsigned long long>(p.cycles()));
-        *diag_os << c << stage_cell(v.if_pc, BubbleCause::FaultFlush) << ' '
+        std::snprintf(c, sizeof c, "%llu ", static_cast<unsigned long long>(p.cycles()));
+        *diag_os << c << (v.if_pc ? stage_cell(v.if_pc, BubbleCause::None) : std::string("-frozen")) << ' '
                  << stage_cell(v.id_pc, v.id_cause) << ' ' << stage_cell(v.ex_pc, v.ex_cause) << ' '
                  << stage_cell(v.mem_pc, v.mem_cause) << ' ' << stage_cell(v.wb_pc, v.wb_cause) << '\n';
       }

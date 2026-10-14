@@ -14,6 +14,8 @@ Every bug found and fixed, with how it was detected.
 
 | 5 | 4 | `scripts/phase4_tables.py` (hot-loop extraction, an analysis tool) | For every `-O0` workload, the "hot loop" listing showed only 3 instructions, the loop-condition check, instead of the 28-instruction loop body | The heuristic took the pcs with exactly the maximum retirement count. At `-O0` the k-loop condition check runs once more per loop than the body (33,792 vs 32,768 times for N=32), so only the check matched. Fix: list every pc retired at least half as often as the hottest one, with its count. | Reading the generated table before using it in the analysis: 3 instructions per multiply-accumulate contradicted the measured 28.83 instructions per MAC | see git log: "Phase 4" |
 
+| 6 | 5 | `scripts/correlate.sh` (correlation harness) | Under RTL mutant V3 (load-use stall removed), the summary read "63 of 279 programs", but only 117 programs were run | `rvsim-rtl`'s stdout was not redirected. When the RTL's contract assertion fired, Verilator printed the `$error` message on stdout, and those lines became extra entries in `programs.txt`. Verdicts were unaffected; the totals were inflated. Fix: capture stdout of both simulators to per-program files. | Reading the Phase 5 mutation-check output: the program total did not equal the number of programs launched | see git log: "Phase 5" |
+
 ## Notes on bug #1
 
 - Fix: spin loops in `RVTEST_PASS`/`RVTEST_FAIL` now use `j .` (no label). The env now defines no numeric labels beyond upstream's single `1:` in `RVTEST_FAIL`. A comment in the header warns about this.

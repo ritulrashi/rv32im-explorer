@@ -1,6 +1,6 @@
 # Phase 5 Design Note: RTL Correlation
 
-Status: **awaiting review**
+Status: **approved 2026-10-13 (RV32I only, no MUL/DIV); implemented. Changes during implementation in §9.**
 
 Goal: a SystemVerilog 5-stage RV32I core that implements the **Phase 2
 contract** (`docs/phase2-pipeline-contract.md`, "P2 §n"), a Verilator
@@ -174,3 +174,19 @@ For each program:
   twice, the two would agree on a wrong behaviour. The hand-derived
   expectations (P2 §10 diagram, directed cycle counts) are the guard against
   that. They come from the contract text, not from either implementation.
+
+## 9. Changes during implementation
+
+- **The decoder, ALU and branch comparator are SystemVerilog functions in
+  `rvx_pkg.sv`,** not separate modules (§3 listed `rvx_decode.sv`,
+  `rvx_alu.sv` and `rvx_regfile.sv`). The behaviour is the same, the code is
+  simpler, and Verilator handles it well. The register file is an array inside
+  `rvx_core.sv`, with write-through as a function.
+- **`scripts/correlate.sh` gives both sides a 1,000,000-cycle budget.** The
+  first RTL mutation run showed that a broken RTL can loop forever on a random
+  program, and the default 100M-cycle budget made every such program take
+  minutes. Real correlation programs run thousands of cycles, so a hung side
+  now fails fast as a summary mismatch.
+- **One lint fix:** `misaligned()` takes only the low 2 address bits (it was
+  flagged by `-Wall` for unused bits). The parameter was narrowed; no lint
+  waiver was used.
