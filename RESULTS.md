@@ -15,7 +15,7 @@ number below appears verbatim in those files. Small integers are parameters
 
 | | |
 |---|---|
-| Measured on | commit `053945e`, clean tree. GitHub Codespace, AMD EPYC 7763, 4 vCPU, Ubuntu 24.04.3; clang 18.1.3, riscv64-unknown-elf-gcc 13.2.0 (full provenance in [`run_summary.txt`](results/phase4/run_summary.txt)) |
+| Measured on | The commit, tree state and machine of the committed run are in [`run_summary.txt`](results/phase4/run_summary.txt): a clean tree in a GitHub Codespace (AMD EPYC 7763, 4 vCPU, Ubuntu 24.04.3), clang 18.1.3, riscv64-unknown-elf-gcc 13.2.0. The analysis was first written against a run at commit `053945e`; the committed run repeats it at a later commit. Only scripts and docs changed in between, and the numbers are identical. |
 | Reproduce | `scripts/phase4_run.sh` (about 108 s on that machine), then `scripts/check_results_numbers.py RESULTS.md results/phase4/*.md results/phase4/raw.csv` |
 | Validity | 150 of 150 runs (30 workloads × 5 configs): each workload passed its own result check (checksum against an independent Python reference) **and** agreed with the golden ISS in lockstep. 5 of 5 determinism re-runs were byte-identical. |
 | Scope | All figures are for the **region of interest** (the kernel only; setup and result checking excluded), on a model, not on hardware. See [LIMITATIONS](docs/LIMITATIONS.md). |
