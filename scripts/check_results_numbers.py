@@ -16,13 +16,17 @@ rounding is allowed, only truncation that keeps the printed digits exact.
 import re
 import sys
 
-TOKEN = re.compile(r"(?<![\w.])(\d{1,3}(?:,\d{3})+|\d+\.\d+)(?![\w])")
+# The lookbehind also skips section references such as "§5.2".
+TOKEN = re.compile(r"(?<![\w.§])(\d{1,3}(?:,\d{3})+|\d+\.\d+)(?![\w])")
 
 
 def main():
     doc, gens = sys.argv[1], sys.argv[2:]
     with open(doc, encoding="utf-8") as f:
         text = f.read()
+    # Links like [contract §6.4](docs/...) and "(§5.1, §5.2)" are references,
+    # not measurements: drop every "§n.n" before scanning.
+    text = re.sub(r"§\d+(?:\.\d+)*", "", text)
     corpus = ""
     for g in gens:
         with open(g, encoding="utf-8") as f:

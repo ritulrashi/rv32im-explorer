@@ -97,7 +97,7 @@ def table_stack(rows, kernel, n, out):
     for r in sel:
         parts = [fmt(r["cpi_" + c] / r["retired"]) for c in CATS]
         out.append(f"| `{r['workload']}` | {r['config']} | {fmt(r['cycles'] / r['retired'])} | " + " | ".join(parts)
-                   + f" | {r['dcache_misses'] if r['dcache_misses'] != '' else '-'} | {r['cond_mispredicts']} |")
+                   + f" | {format(r['dcache_misses'], ',') if r['dcache_misses'] != '' else '-'} | {r['cond_mispredicts']:,} |")
     out.append("")
 
 

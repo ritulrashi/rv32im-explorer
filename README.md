@@ -11,7 +11,7 @@ A cycle-accurate, parameterizable in-order RISC-V (RV32IM) pipeline model in C++
 | 1 | Golden functional ISS + riscv-tests | **Done.** [results/phase1/](results/phase1/) |
 | 2 | Cycle-accurate 5-stage pipeline + lockstep checker + random programs | **Done.** [results/phase2/](results/phase2/) |
 | 3 | Branch predictors, caches, DRAM model, config files, CPI stack | **Done.** [results/phase3/](results/phase3/) |
-| 4 | Assembly / compiled workloads, RESULTS.md | not started |
+| 4 | Assembly and clang-compiled workloads, compiler analysis, [RESULTS.md](RESULTS.md) | **Done.** [results/phase4/](results/phase4/) |
 | 5 | SystemVerilog RTL correlation | not started |
 | 6 | Sweep automation, plots, CI | not started |
 
@@ -31,6 +31,7 @@ src/pipeline/      Cycle-accurate IF/ID/EX/MEM/WB pipeline, written as flops (cu
 src/bpred/         static not-taken, bimodal, gshare direction predictors; BTB (timing only)
 src/cache/         tag-only set-associative LRU caches, banked open-page DRAM model, miss penalties
 configs/           baseline (= Phase 2), bimodal_btb, gshare_btb, small_caches, big
+workloads/         Phase 4 kernels: asm/ (hand-written), c/ (clang -O0/-O3), common/ (runtime, ROI markers), gen_data.py
 tools/
   rvsim-iss          run a program on the ISS
   rvsim-pipe         run a program on the pipeline (cycles, trace, per-cycle diagram)
@@ -96,5 +97,6 @@ Trace format (one line per retired instruction):
 | Phase 2 lockstep sanity check (injected pipeline bugs are detected) | `scripts/phase2_mutation_check.sh` | `results/phase2/mutation_check.txt` |
 | Phase 3 exit criterion (directed tests, Phase 2 regression, CPI sum, lockstep under 5 configs) | `scripts/phase3_exit.sh` | `results/phase3/exit_criterion.txt` |
 | Phase 3 sanity check (injected timing bugs are detected) | `scripts/phase3_mutation_check.sh` | `results/phase3/mutation_check.txt` |
+| Phase 4: every workload × every config, tables, investigations, and the check that every number in [RESULTS.md](RESULTS.md) is generated | `scripts/phase4_run.sh` | `results/phase4/` (`tables.md`, `investigations.md`, `raw.csv`, `stats/`, `results_check.txt`) |
 
 Every results file starts with the output of `scripts/env_report.sh`: commit, whether the tree was clean, submodule pin, `lscpu`, and tool versions. Run each script on a clean checkout. A script that runs after another has written a results file will correctly report the tree as dirty.
