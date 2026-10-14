@@ -33,9 +33,28 @@ target_include_directories(rvx_iss PUBLIC src)
 target_link_libraries(rvx_iss PUBLIC rvx_common)
 target_compile_options(rvx_iss PRIVATE ${RVX_WARNINGS})
 
+add_library(rvx_pipeline STATIC
+  src/pipeline/pipeline.cpp
+  src/pipeline/exec.cpp)
+target_include_directories(rvx_pipeline PUBLIC src)
+target_link_libraries(rvx_pipeline PUBLIC rvx_common)
+target_compile_options(rvx_pipeline PRIVATE ${RVX_WARNINGS})
+
 add_executable(rvsim-iss tools/iss_main.cpp)
 target_link_libraries(rvsim-iss PRIVATE rvx_iss)
 target_compile_options(rvsim-iss PRIVATE ${RVX_WARNINGS})
+
+add_executable(rvsim-pipe tools/pipe_main.cpp)
+target_link_libraries(rvsim-pipe PRIVATE rvx_pipeline)
+target_compile_options(rvsim-pipe PRIVATE ${RVX_WARNINGS})
+
+add_executable(rvsim-lockstep tools/lockstep_main.cpp)
+target_link_libraries(rvsim-lockstep PRIVATE rvx_iss rvx_pipeline)
+target_compile_options(rvsim-lockstep PRIVATE ${RVX_WARNINGS})
+
+add_executable(rvgen tools/rvgen.cpp)
+target_include_directories(rvgen PRIVATE src)
+target_compile_options(rvgen PRIVATE ${RVX_WARNINGS})
 
 if(RVX_BUILD_TESTS)
   enable_testing()

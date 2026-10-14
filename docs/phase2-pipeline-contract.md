@@ -1,6 +1,6 @@
 # Phase 2 Design Note: 5-Stage Pipeline Contract
 
-Status: **awaiting review**
+Status: **approved 2026-10-13 (including §11 sharing); implemented. Clarifications added during implementation are listed in §13.**
 
 This document is the **contract** for the cycle-accurate pipeline model
 (`src/pipeline`), and later for the SystemVerilog RTL (`rtl/`, Phase 5). Both
@@ -48,12 +48,18 @@ instructions with no hazards takes **N + 4 cycles**.
 |---|---|---|
 | IF | `PC` register | instruction memory; redirect and stall signals |
 | ID | — (combinational decode and register read) | `IF/ID`, register file |
-| EX | `ex_busy_count` (cycles left for an in-flight MUL/DIV) | `ID/EX`, forwarding from `EX/MEM` and `MEM/WB` |
+| EX | `md_cycles` (cycles the current MUL/DIV has spent in EX), `md_a`, `md_b` (operands captured on its first EX cycle) | `ID/EX`, forwarding from `EX/MEM` and `MEM/WB` |
 | MEM | — | `EX/MEM`, data memory (loads read, stores write, in this stage) |
 | WB | register file `x1..x31` (write port); retire counter | `MEM/WB` |
 
 Each pipeline register is written by the stage on its **left** and read by the
 stage on its **right**.
+
+### 3.0 Memory timing
+
+A store in MEM writes memory **at the end of the cycle** (the clock edge).
+Any read in that same cycle, whether a load in MEM or the fetch in IF, sees
+the old contents. This matches a synchronous-write RAM in RTL.
 
 ### 3.1 Register file timing
 
@@ -130,10 +136,14 @@ that costs.
 
 ### 6.2 Load-use stall (1 cycle)
 
-**Condition (evaluated in ID):** `ID/EX` holds a valid load with
-`rd != 0`, and the instruction in ID reads that register as `rs1` or `rs2`
-according to its format. **Action:** hold `PC` and `IF/ID`; put a bubble
-(`bubble_cause = LoadUse`) into `ID/EX`.
+**Condition (evaluated in ID):** `ID/EX` holds a valid, **non-faulting**
+load with `rd != 0`, and the instruction in ID reads that register as `rs1`
+or `rs2` according to its format. "Non-faulting" includes the misaligned
+check that EX does in the same cycle. A faulting load takes the fault path
+(§6.6) instead, which keeps the control signals mutually exclusive (§6.7).
+
+**Action:** hold `PC` and `IF/ID`; put a bubble (`bubble_cause = LoadUse`)
+into `ID/EX`.
 
 ```
 cycle:          1    2    3    4    5    6    7
@@ -180,6 +190,10 @@ radix-2 iterative divider (1 setup cycle + 32 iterations). They are not claims
 about any particular chip. The latency is **fixed**: no early-out for small
 operands or divide-by-zero. That keeps it deterministic and easy to match in
 RTL. A latency of L means the instruction occupies EX for exactly L cycles.
+- **Cycle 1 in EX:** the operands go through the forwarding muxes as usual
+  and are captured into `md_a` and `md_b`. Later cycles use the captured
+  values. Without this, a producer could retire while the MUL/DIV is still
+  busy, and the stale value read in ID would be used.
 - **Cycles 1 … L−1 in EX:** `ex_busy`. `PC`, `IF/ID` and `ID/EX` hold;
   `EX/MEM ← bubble` (`bubble_cause = MulDiv`). MEM and WB keep draining older
   instructions.
@@ -350,3 +364,23 @@ halt detection. The pipeline gets a fresh implementation of each, in
 | Faults act in EX, retire nothing | Precise traps | There is no trap architecture (Phase 1 decision). This is the minimum that matches the ISS exactly and never lets a wrong-path or post-fault store write memory |
 | Model written as flops (current/next latches) | Evaluate stages in reverse order, updating in place | Order-independent and maps 1:1 to RTL. Reverse-order evaluation works, but hides the clock edge, and RTL correlation is the whole point |
 | Pipeline diagram as a test oracle | Only total cycle counts | Totals can match while internal timing differs, with errors cancelling out. Per-cycle occupancy cannot hide that |
+
+## 13. Clarifications added during implementation
+
+These were found while deriving the hand-drawn diagram test or the hazard
+cases. None of them changes a cycle count that §6 already stated; each pins
+down behaviour §6 left implicit.
+
+1. **Memory write timing (§3.0).** A store's write happens at the clock edge,
+   so a same-cycle fetch or load sees the old data. Needed to define exactly
+   when `FENCE.I` makes a store visible.
+2. **MUL/DIV operand capture (§3, §6.4).** Operands are captured into
+   `md_a`/`md_b` on the first EX cycle. Without this, a producer that retires
+   during a long DIV would leave the stale value read in ID. The
+   `MulOperandsAreCapturedOnFirstExCycle` test fails if capture is removed.
+3. **Faulting loads never cause a load-use stall (§6.2).** Without this, a
+   misaligned load followed by a consumer would raise both `fault_flush` and
+   `load_use` in one cycle, violating §6.7.
+4. **The halting cycle commits only WB (§7).** When the tohost store retires,
+   a younger store that is in MEM in the same cycle must not write memory.
+   The ISS never executes it.

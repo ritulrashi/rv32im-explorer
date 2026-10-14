@@ -8,6 +8,8 @@ Every bug found and fixed, with how it was detected.
 
 | 2 | 1 | `scripts/phase1_exit.sh`, `scripts/phase1_mutation_check.sh` (result provenance) | The first official run on a clean checkout of `cc3da27` reported `tree: DIRTY` | Both scripts piped their output through `tee results/phase1/...`. `tee` creates its output file as soon as the pipeline starts, so `env_report.sh`, running inside that same pipeline, saw an untracked `results/` directory. The measured code really was `cc3da27`, but the label was wrong. | Reading the generated results file before publishing it. The provenance block contradicted `git status`, which had been clean immediately before the run. | see git log: "Fix result provenance" |
 
+| 3 | 2 | `tools/rvgen.cpp` (random program generator) | None observed. Caught before the code was first run. | Calls such as `line(fmt, kR[rng.below(10)], dst(), a, b)` drew several random numbers inside one function call's arguments. C++ does not specify the order in which arguments are evaluated, so another compiler (or GCC at another optimisation level) could draw them in a different order and produce a different program from the same seed. That breaks rule 5 (determinism) and makes a failing seed irreproducible on another machine. | Code review while writing `rvgen`, before the first run | see git log: "Phase 2" |
+
 ## Notes on bug #1
 
 - Fix: spin loops in `RVTEST_PASS`/`RVTEST_FAIL` now use `j .` (no label). The env now defines no numeric labels beyond upstream's single `1:` in `RVTEST_FAIL`. A comment in the header warns about this.

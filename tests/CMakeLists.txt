@@ -15,9 +15,10 @@ add_executable(rvx_unit_tests
   unit/memory_test.cpp
   unit/trace_test.cpp
   unit/iss_test.cpp
-  unit/loader_test.cpp)
+  unit/loader_test.cpp
+  unit/pipeline_timing_test.cpp)
 target_include_directories(rvx_unit_tests PRIVATE unit)
-target_link_libraries(rvx_unit_tests PRIVATE rvx_iss GTest::gtest_main)
+target_link_libraries(rvx_unit_tests PRIVATE rvx_iss rvx_pipeline GTest::gtest_main)
 target_compile_options(rvx_unit_tests PRIVATE ${RVX_WARNINGS})
 gtest_discover_tests(rvx_unit_tests PROPERTIES LABELS unit)
 
@@ -92,6 +93,14 @@ foreach(suite rv32ui rv32um)
     add_test(NAME ${suite}-${name}
              COMMAND rvsim-iss ${elf} --max-insns 1000000)
     set_tests_properties(${suite}-${name} PROPERTIES LABELS "riscv-tests;${suite}")
+    # Phase 2: the pipeline must pass the test on its own...
+    add_test(NAME pipe-${suite}-${name}
+             COMMAND rvsim-pipe ${elf} --max-cycles 10000000)
+    set_tests_properties(pipe-${suite}-${name} PROPERTIES LABELS "pipeline;${suite}")
+    # ...and agree with the ISS on every retired instruction.
+    add_test(NAME lockstep-${suite}-${name}
+             COMMAND rvsim-lockstep ${elf} --max-cycles 10000000)
+    set_tests_properties(lockstep-${suite}-${name} PROPERTIES LABELS "lockstep;${suite}")
     math(EXPR RVX_RISCV_TEST_COUNT "${RVX_RISCV_TEST_COUNT} + 1")
   endforeach()
 endforeach()
@@ -106,4 +115,16 @@ add_test(NAME trace-determinism
                  -DOUT=${CMAKE_CURRENT_BINARY_DIR}/determinism
                  -P ${CMAKE_CURRENT_SOURCE_DIR}/trace_determinism.cmake)
 set_tests_properties(trace-determinism PROPERTIES LABELS determinism)
+
+# Random programs in lockstep. CTest runs a small smoke range on every build;
+# the Phase 2 exit criterion uses scripts/phase2_exit.sh with seeds 1-1000.
+add_test(NAME random-lockstep-smoke
+         COMMAND bash ${PROJECT_SOURCE_DIR}/scripts/random_lockstep.sh
+                 ${CMAKE_BINARY_DIR} 1 50 ${CMAKE_CURRENT_BINARY_DIR}/random-smoke)
+set_tests_properties(random-lockstep-smoke PROPERTIES LABELS "lockstep;random")
+
+# rvgen determinism: the same seed must give byte-identical assembly.
+add_test(NAME rvgen-determinism
+         COMMAND sh -c "$<TARGET_FILE:rvgen> --seed 12345 > ${CMAKE_CURRENT_BINARY_DIR}/g1.S && $<TARGET_FILE:rvgen> --seed 12345 > ${CMAKE_CURRENT_BINARY_DIR}/g2.S && cmp ${CMAKE_CURRENT_BINARY_DIR}/g1.S ${CMAKE_CURRENT_BINARY_DIR}/g2.S")
+set_tests_properties(rvgen-determinism PROPERTIES LABELS determinism)
 message(STATUS "riscv-tests: ${RVX_RISCV_TEST_COUNT} registered, excluded: ${RVX_RISCV_TEST_EXCLUDED}")
