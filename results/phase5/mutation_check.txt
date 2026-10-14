@@ -1,0 +1,106 @@
+# Phase 5 mutation check: does RTL-vs-model correlation catch injected RTL bugs?
+command: scripts/phase5_mutation_check.sh
+
+## Provenance (of the unmutated tree)
+date_utc: 2026-10-14T04:18:43Z
+commit: 1f474612024337bd0b82e91ad9eb692ea3f24136
+tree: clean
+riscv-tests: 7b68f7b91f827f8d94cc1c57ff123752c5c8f704
+host: Linux 6.8.0-1064-azure x86_64
+os: Ubuntu 24.04.3 LTS
+lscpu:
+  Architecture:                            x86_64
+  CPU(s):                                  4
+  Model name:                              AMD EPYC 7763 64-Core Processor
+  Thread(s) per core:                      2
+  Core(s) per socket:                      2
+  Socket(s):                               1
+  L1d cache:                               64 KiB (2 instances)
+  L1i cache:                               64 KiB (2 instances)
+  L2 cache:                                1 MiB (2 instances)
+  L3 cache:                                32 MiB (1 instance)
+mem_total: 16377436 kB
+tools:
+  c++: c++ (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0
+  cmake: cmake version 3.28.3
+  ninja: 1.11.1
+  riscv-gcc: riscv64-unknown-elf-gcc (13.2.0-11ubuntu1+12) 13.2.0
+  riscv-binutils: GNU assembler (2.42-1ubuntu1+6) 2.42
+  clang: Ubuntu clang version 18.1.3 (1ubuntu1)
+  python3: Python 3.12.3
+  verilator: Verilator 5.020 2024-01-01 rev (Debian 5.020-1)
+
+## Mutant V1
+rtl/rvx_core.sv:117:    // MUTANT V1: no write-through
+correlate: directed: 25 of 26 programs match at all levels
+correlate: riscv: 8 of 41 programs match at all levels
+correlate: random: 0 of 50 programs match at all levels
+correlate: total: 33 of 117 programs match; cycles compared stage-by-stage in matching programs: 2307
+  first detected at MISMATCH-1-summary: 54 programs
+  first detected at MISMATCH-2-trace: 30 programs
+  example: directed t04_writethrough MISMATCH-2-trace cycles=9 rtl_rc=1 model_rc=1 4c4 < 3 pc=0000000c insn=00108133 rd=x02 val=0000000a mem=- addr=- data=- sz=- --- > 3 pc=0000000c insn=00108133 rd=x02 val=0000
+
+## Mutant V2
+rtl/rvx_core.sv:161:    if (mem_wb_q.valid && mem_wb_q.exc == HALT_NONE && mem_wb_q.rd == rs) return mem_wb_q.value;  // MUTANT V2
+correlate: directed: 24 of 26 programs match at all levels
+correlate: riscv: 11 of 41 programs match at all levels
+correlate: random: 0 of 50 programs match at all levels
+correlate: total: 35 of 117 programs match; cycles compared stage-by-stage in matching programs: 3727
+  first detected at MISMATCH-1-summary: 79 programs
+  first detected at MISMATCH-2-trace: 3 programs
+  example: directed t02_dep_chain MISMATCH-2-trace cycles=15 rtl_rc=1 model_rc=1 3,10c3,10 < 2 pc=00000008 insn=00108093 rd=x01 val=00000003 mem=- addr=- data=- sz=- < 3 pc=0000000c insn=00108093 rd=x01 val=0000
+
+## Mutant V3
+rtl/rvx_core.sv:280:      load_use = 1'b0 && id_ex_q.valid && id_ex_q.exc == HALT_NONE && !ex_fault &&  // MUTANT V3
+correlate: directed: 19 of 26 programs match at all levels
+correlate: riscv: 35 of 41 programs match at all levels
+correlate: random: 9 of 50 programs match at all levels
+correlate: total: 63 of 117 programs match; cycles compared stage-by-stage in matching programs: 15165
+  first detected at MISMATCH-1-summary: 54 programs
+  example: directed t05_load_use MISMATCH-1-summary cycles=0 rtl_rc=134 model_rc=1 rtl: no-summary | model: halt=tohost retired=3 cycles=8 pc=0x0000000c
+
+## Mutant V4
+rtl/rvx_core.sv:235:            redirect = 1'b0;  // MUTANT V4
+correlate: directed: 23 of 26 programs match at all levels
+correlate: riscv: 40 of 41 programs match at all levels
+correlate: random: 22 of 50 programs match at all levels
+correlate: total: 85 of 117 programs match; cycles compared stage-by-stage in matching programs: 20958
+  first detected at MISMATCH-1-summary: 32 programs
+  example: directed t17_fencei MISMATCH-1-summary cycles=6 rtl_rc=1 model_rc=1 rtl: halt=tohost retired=2 cycles=6 pc=0x00000008 | model: halt=tohost retired=2 cycles=8 pc=0x00000008
+
+## Mutant V5
+rtl/rvx_pkg.sv:218:      3'd4:    return a < b;  // MUTANT V5
+correlate: directed: 26 of 26 programs match at all levels
+correlate: riscv: 40 of 41 programs match at all levels
+correlate: random: 16 of 50 programs match at all levels
+correlate: total: 82 of 117 programs match; cycles compared stage-by-stage in matching programs: 20242
+  first detected at MISMATCH-1-summary: 35 programs
+  example: random rv32i-seed-1 MISMATCH-1-summary cycles=721 rtl_rc=0 model_rc=0 rtl: halt=tohost retired=546 cycles=721 pc=0x80000634 | model: halt=tohost retired=545 cycles=730 pc=0x80000634
+
+## Mutant V6
+rtl/rvx_core.sv:330:      n_id_ex_sel.cause = CAUSE_MISPREDICT;  // MUTANT V6
+correlate: directed: 19 of 26 programs match at all levels
+correlate: riscv: 35 of 41 programs match at all levels
+correlate: random: 9 of 50 programs match at all levels
+correlate: total: 63 of 117 programs match; cycles compared stage-by-stage in matching programs: 15165
+  first detected at MISMATCH-3-diagram: 54 programs
+  example: directed t05_load_use MISMATCH-3-diagram cycles=8 rtl_rc=1 model_rc=1 5,7c5,7 < 4 00000008 00000004 -load-use 00000000 -fill < 5 0000000c 00000008 00000004 -load-use 00000000 < 6 00000010 0000000c 000
+
+## Mutant V7
+rtl/rvx_core.sv:226:            if (1'b0) begin  // MUTANT V7
+correlate: directed: 25 of 26 programs match at all levels
+correlate: riscv: 41 of 41 programs match at all levels
+correlate: random: 50 of 50 programs match at all levels
+correlate: total: 116 of 117 programs match; cycles compared stage-by-stage in matching programs: 35561
+  first detected at MISMATCH-1-summary: 1 programs
+  example: directed t24_misaligned_jump MISMATCH-1-summary cycles=8 rtl_rc=2 model_rc=3 rtl: halt=illegal-instruction retired=1 cycles=8 pc=0x00000006 | model: halt=misaligned-fetch retired=0 cycles=5 pc=0x00000
+
+## Mutant V8
+rtl/rvx_core.sv:324:      n_id_ex_sel = n_id_ex;  // MUTANT V8
+correlate: directed: 17 of 26 programs match at all levels
+correlate: riscv: 0 of 41 programs match at all levels
+correlate: random: 0 of 50 programs match at all levels
+correlate: total: 17 of 117 programs match; cycles compared stage-by-stage in matching programs: 136
+  first detected at MISMATCH-1-summary: 99 programs
+  first detected at MISMATCH-3-diagram: 1 programs
+  example: directed t11_taken MISMATCH-1-summary cycles=8 rtl_rc=1 model_rc=1 rtl: halt=tohost retired=3 cycles=8 pc=0x0000000c | model: halt=tohost retired=2 cycles=8 pc=0x0000000c
