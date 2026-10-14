@@ -1,20 +1,24 @@
 // rvsim-pipe: run a program on the cycle-accurate pipeline model.
 //
-//   rvsim-pipe PROGRAM [--trace FILE|-] [--diagram FILE|-]
-//              [--mul-latency N] [--div-latency N] [--max-cycles N]
+//   rvsim-pipe PROGRAM [--config FILE] [--set key=value]... [--max-cycles N]
+//              [--trace FILE|-] [--diagram FILE|-] [--stats FILE|-]
 //
 // Prints a one-line summary on stderr. Exit codes as rvsim-iss.
+// --stats writes JSON: resolved config, cycles, CPI stack, predictor, cache
+// and DRAM counters (docs/phase3-design.md §5).
 // --diagram writes one line per cycle: cycle, then the pc held by each of
 // IF ID EX MEM WB, or "--------" for a bubble (with its cause).
 #include <cstdio>
 #include <fstream>
 #include <iostream>
 #include <string>
+#include <vector>
 
 #include "cli_common.h"
 #include "common/loader.h"
 #include "common/trace.h"
 #include "pipeline/pipeline.h"
+#include "pipeline/stats_json.h"
 
 namespace {
 
@@ -34,7 +38,8 @@ std::string stage_cell(const std::optional<uint32_t>& pc, BubbleCause cause) {
 }  // namespace
 
 int main(int argc, char** argv) {
-  std::string program, trace_path, diagram_path;
+  std::string program, trace_path, diagram_path, stats_path, config_path;
+  std::vector<std::string> overrides;
   Config cfg;
   uint64_t max_cycles = 100'000'000;
   try {
@@ -42,14 +47,16 @@ int main(int argc, char** argv) {
       const std::string a = argv[k];
       if (a == "--trace") trace_path = cli::next_str(k, argc, argv);
       else if (a == "--diagram") diagram_path = cli::next_str(k, argc, argv);
-      else if (a == "--mul-latency") cfg.mul_latency = static_cast<unsigned>(cli::next_num(k, argc, argv));
-      else if (a == "--div-latency") cfg.div_latency = static_cast<unsigned>(cli::next_num(k, argc, argv));
+      else if (a == "--stats") stats_path = cli::next_str(k, argc, argv);
+      else if (a == "--config") config_path = cli::next_str(k, argc, argv);
+      else if (a == "--set") overrides.push_back(cli::next_str(k, argc, argv));
       else if (a == "--max-cycles") max_cycles = cli::next_num(k, argc, argv);
       else if (!a.empty() && a[0] == '-') throw std::runtime_error("unknown option " + a);
       else if (program.empty()) program = a;
       else throw std::runtime_error("more than one PROGRAM given");
     }
     if (program.empty()) throw std::runtime_error("no PROGRAM given");
+    cfg = load_config(config_path, overrides);
   } catch (const std::exception& e) {
     std::fprintf(stderr, "rvsim-pipe: %s\n", e.what());
     return 6;
@@ -71,12 +78,14 @@ int main(int argc, char** argv) {
     if (!f) throw std::runtime_error("cannot open " + path);
     return &f;
   };
-  std::ofstream tf, df;
+  std::ofstream tf, df, sf;
   std::ostream* trace_os = nullptr;
   std::ostream* diag_os = nullptr;
+  std::ostream* stats_os = nullptr;
   try {
     trace_os = open(trace_path, tf);
     diag_os = open(diagram_path, df);
+    stats_os = open(stats_path, sf);
   } catch (const std::exception& e) {
     std::fprintf(stderr, "rvsim-pipe: %s\n", e.what());
     return 6;
@@ -115,6 +124,7 @@ int main(int argc, char** argv) {
                static_cast<unsigned long long>(p.retired()),
                static_cast<unsigned long long>(p.cycles()), h.pc);
   if (h.reason == HaltReason::ToHost) std::fprintf(stderr, " tohost=0x%08x", h.tohost_value);
+  if (stats_os) *stats_os << stats_json(p, program);
   std::fprintf(stderr, "\n");
   return code;
 }

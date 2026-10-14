@@ -16,7 +16,11 @@ add_executable(rvx_unit_tests
   unit/trace_test.cpp
   unit/iss_test.cpp
   unit/loader_test.cpp
-  unit/pipeline_timing_test.cpp)
+  unit/pipeline_timing_test.cpp
+  unit/config_test.cpp
+  unit/bpred_test.cpp
+  unit/cache_test.cpp
+  unit/pipeline_phase3_test.cpp)
 target_include_directories(rvx_unit_tests PRIVATE unit)
 target_link_libraries(rvx_unit_tests PRIVATE rvx_iss rvx_pipeline GTest::gtest_main)
 target_compile_options(rvx_unit_tests PRIVATE ${RVX_WARNINGS})
@@ -122,6 +126,26 @@ add_test(NAME random-lockstep-smoke
          COMMAND bash ${PROJECT_SOURCE_DIR}/scripts/random_lockstep.sh
                  ${CMAKE_BINARY_DIR} 1 50 ${CMAKE_CURRENT_BINARY_DIR}/random-smoke)
 set_tests_properties(random-lockstep-smoke PROPERTIES LABELS "lockstep;random")
+
+# Phase 3: the baseline config must reproduce Phase 2 cycle counts exactly,
+# lockstep must agree under every config, and the CPI stack must sum to the
+# total cycle count for every run.
+set(RVX_CONFIGS baseline bimodal_btb gshare_btb small_caches big)
+add_test(NAME phase2-regression
+         COMMAND bash ${PROJECT_SOURCE_DIR}/scripts/phase2_regression.sh ${CMAKE_BINARY_DIR})
+set_tests_properties(phase2-regression PROPERTIES LABELS "regression")
+set(RVX_CONFIG_FILES "")
+foreach(cfg ${RVX_CONFIGS})
+  list(APPEND RVX_CONFIG_FILES ${PROJECT_SOURCE_DIR}/configs/${cfg}.cfg)
+  add_test(NAME random-lockstep-${cfg}
+           COMMAND bash ${PROJECT_SOURCE_DIR}/scripts/random_lockstep.sh
+                   ${CMAKE_BINARY_DIR} 1 25 ${CMAKE_CURRENT_BINARY_DIR}/random-${cfg}
+                   -- --config ${PROJECT_SOURCE_DIR}/configs/${cfg}.cfg)
+  set_tests_properties(random-lockstep-${cfg} PROPERTIES LABELS "lockstep;random;configs")
+endforeach()
+add_test(NAME cpi-sum
+         COMMAND python3 ${PROJECT_SOURCE_DIR}/scripts/check_cpi_sum.py ${CMAKE_BINARY_DIR} ${RVX_CONFIG_FILES})
+set_tests_properties(cpi-sum PROPERTIES LABELS "cpi")
 
 # rvgen determinism: the same seed must give byte-identical assembly.
 add_test(NAME rvgen-determinism

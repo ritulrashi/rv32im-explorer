@@ -10,7 +10,7 @@ A cycle-accurate, parameterizable in-order RISC-V (RV32IM) pipeline model in C++
 |---|---|---|
 | 1 | Golden functional ISS + riscv-tests | **Done.** [results/phase1/](results/phase1/) |
 | 2 | Cycle-accurate 5-stage pipeline + lockstep checker + random programs | **Done.** [results/phase2/](results/phase2/) |
-| 3 | Branch predictors, caches, DRAM model, CPI stack | not started |
+| 3 | Branch predictors, caches, DRAM model, config files, CPI stack | **Done.** [results/phase3/](results/phase3/) |
 | 4 | Assembly / compiled workloads, RESULTS.md | not started |
 | 5 | SystemVerilog RTL correlation | not started |
 | 6 | Sweep automation, plots, CI | not started |
@@ -25,18 +25,24 @@ src/common/        Shared by both models (approved in docs/phase2-pipeline-contr
   loader.*           hand-written ELF32 loader (PT_LOAD + symtab) and flat-binary loader
 src/iss/           Golden ISS: one instruction per step(), no timing
 src/pipeline/      Cycle-accurate IF/ID/EX/MEM/WB pipeline, written as flops (current/next latches)
+  config.*           machine config: strict `key = value` parser, validation, describe()
+  stats*             CPI stack (retire-slot accounting) and JSON stats
   exec.*             the pipeline's own ALU/branch/load/MUL/DIV semantics (independent of src/iss)
+src/bpred/         static not-taken, bimodal, gshare direction predictors; BTB (timing only)
+src/cache/         tag-only set-associative LRU caches, banked open-page DRAM model, miss penalties
+configs/           baseline (= Phase 2), bimodal_btb, gshare_btb, small_caches, big
 tools/
   rvsim-iss          run a program on the ISS
   rvsim-pipe         run a program on the pipeline (cycles, trace, per-cycle diagram)
   rvsim-lockstep     run both models side by side; stop at the first divergence
   rvgen              seeded, platform-deterministic random program generator (emits assembly)
-tests/unit/        GoogleTest: decode, memory, loader, trace, ISS semantics, pipeline timing
+tests/unit/        GoogleTest: decode, memory, loader, trace, ISS semantics, pipeline timing,
+                   config, predictors, caches, DRAM, Phase 3 pipeline integration
 tests/riscv-tests-env/  minimal test environment replacing upstream env/p
 third_party/riscv-tests official riscv-tests, pinned git submodule
 ```
 
-Design notes: [Phase 1](docs/phase1-design.md) and [Phase 2 pipeline contract](docs/phase2-pipeline-contract.md) (the RTL will implement the same contract). Known limits: [docs/LIMITATIONS.md](docs/LIMITATIONS.md). Bugs found and how they were detected: [docs/BUGS.md](docs/BUGS.md).
+Design notes: [Phase 1](docs/phase1-design.md), [Phase 2 pipeline contract](docs/phase2-pipeline-contract.md) (the RTL will implement the same contract), [Phase 3 predictors/caches/CPI stack](docs/phase3-design.md). Known limits: [docs/LIMITATIONS.md](docs/LIMITATIONS.md). Bugs found and how they were detected: [docs/BUGS.md](docs/BUGS.md).
 
 ## Build
 
@@ -55,7 +61,8 @@ cmake --preset release  && cmake --build --preset release  # -O3, for benchmarks
 ctest --preset asan                     # everything below
 ctest --preset asan -L riscv-tests      # ISS on rv32ui/rv32um
 ctest --preset asan -L pipeline         # pipeline on rv32ui/rv32um
-ctest --preset asan -L lockstep         # ISS vs pipeline, riscv-tests + 50 random programs
+ctest --preset asan -L lockstep         # ISS vs pipeline: riscv-tests, random programs, every config
+ctest --preset asan -L regression       # baseline config reproduces the Phase 2 cycle counts
 
 B=build/release
 $B/rvsim-iss  $B/tests/riscv-tests/rv32ui-add.elf --trace -        # ISS retire trace
@@ -63,7 +70,14 @@ $B/rvsim-pipe $B/tests/riscv-tests/rv32ui-add.elf --diagram -      # per-cycle s
 $B/rvsim-lockstep $B/tests/riscv-tests/rv32um-div.elf              # lockstep one program
 scripts/random_lockstep.sh $B 1 100                                # lockstep random seeds 1-100
 $B/rvgen --seed 42 > prog.S                                        # one random program
+
+# Phase 3: any machine config (+ overrides), with JSON stats: cycles, CPI stack,
+# branch/predictor, cache and DRAM counters. Integers only; ratios are left to the reader.
+$B/rvsim-pipe prog.elf --config configs/small_caches.cfg --set bpred.type=gshare --stats -
+$B/rvsim-lockstep prog.elf --config configs/big.cfg                # lockstep must hold under every config
 ```
+
+Config files are `key = value` text (see [configs/](configs/) and [docs/phase3-design.md §1](docs/phase3-design.md)). Unknown keys and impossible geometries are errors. The stats JSON always echoes the fully resolved config.
 
 Exit codes for `rvsim-iss` and `rvsim-pipe`: 0 pass, 1 fail (tohost value ≠ 1), 2 illegal instruction, 3 misaligned access, 4 ecall/ebreak, 5 instruction/cycle budget exhausted, 6 usage/load error. `rvsim-lockstep`: 0 the models agree, 1 divergence (a report is printed), 2 did not finish, 6 usage/load error.
 
@@ -80,5 +94,7 @@ Trace format (one line per retired instruction):
 | Phase 1 harness sanity check (injected ISS bugs are detected) | `scripts/phase1_mutation_check.sh` | `results/phase1/mutation_check.txt` |
 | Phase 2 exit criterion (lockstep on riscv-tests + seeds 1-1000, timing tests, determinism) | `scripts/phase2_exit.sh` | `results/phase2/exit_criterion.txt` |
 | Phase 2 lockstep sanity check (injected pipeline bugs are detected) | `scripts/phase2_mutation_check.sh` | `results/phase2/mutation_check.txt` |
+| Phase 3 exit criterion (directed tests, Phase 2 regression, CPI sum, lockstep under 5 configs) | `scripts/phase3_exit.sh` | `results/phase3/exit_criterion.txt` |
+| Phase 3 sanity check (injected timing bugs are detected) | `scripts/phase3_mutation_check.sh` | `results/phase3/mutation_check.txt` |
 
 Every results file starts with the output of `scripts/env_report.sh`: commit, whether the tree was clean, submodule pin, `lscpu`, and tool versions. Run each script on a clean checkout. A script that runs after another has written a results file will correctly report the tree as dirty.

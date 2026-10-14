@@ -23,7 +23,8 @@ add_library(rvx_common STATIC
   src/common/decode.cpp
   src/common/trace.cpp
   src/common/memory.cpp
-  src/common/loader.cpp)
+  src/common/loader.cpp
+  src/common/kvfile.cpp)
 target_include_directories(rvx_common PUBLIC src)
 target_compile_options(rvx_common PRIVATE ${RVX_WARNINGS})
 
@@ -33,11 +34,24 @@ target_include_directories(rvx_iss PUBLIC src)
 target_link_libraries(rvx_iss PUBLIC rvx_common)
 target_compile_options(rvx_iss PRIVATE ${RVX_WARNINGS})
 
+add_library(rvx_bpred STATIC src/bpred/predictor.cpp)
+target_include_directories(rvx_bpred PUBLIC src)
+target_compile_options(rvx_bpred PRIVATE ${RVX_WARNINGS})
+
+add_library(rvx_cache STATIC
+  src/cache/cache.cpp
+  src/cache/dram.cpp
+  src/cache/memsys.cpp)
+target_include_directories(rvx_cache PUBLIC src)
+target_compile_options(rvx_cache PRIVATE ${RVX_WARNINGS})
+
 add_library(rvx_pipeline STATIC
   src/pipeline/pipeline.cpp
-  src/pipeline/exec.cpp)
+  src/pipeline/exec.cpp
+  src/pipeline/config.cpp
+  src/pipeline/stats_json.cpp)
 target_include_directories(rvx_pipeline PUBLIC src)
-target_link_libraries(rvx_pipeline PUBLIC rvx_common)
+target_link_libraries(rvx_pipeline PUBLIC rvx_common rvx_bpred rvx_cache)
 target_compile_options(rvx_pipeline PRIVATE ${RVX_WARNINGS})
 
 add_executable(rvsim-iss tools/iss_main.cpp)

@@ -1,6 +1,6 @@
 # Phase 3 Design Note: Microarchitecture Knobs and the CPI Stack
 
-Status: **awaiting review**
+Status: **approved 2026-10-13; implemented. Clarifications from implementation in §9.**
 
 Phase 3 adds branch prediction (static not-taken, bimodal, gshare, optional
 BTB), L1 instruction and data caches, a banked DRAM latency model, a
@@ -91,7 +91,7 @@ Their results travel in `IF/ID`.
 |---|---|
 | **IF** | If the BTB hits: for `jal`/`jalr` kinds, predict taken to the BTB target; for `cond`, use the direction predictor. A taken prediction means the next fetch is from the BTB target, at **0 bubbles**. Otherwise fetch `pc + 4`. |
 | **ID** (only when no BTB redirect happened, and only in a cycle where the instruction advances to EX) | If it is a `JAL`, or a conditional branch predicted taken, **redirect fetch to `pc + imm`, costing 1 bubble.** If IF used a BTB target that doesn't match the decoded target, or the instruction isn't a branch at all, correct it, also for 1 bubble. `JALR` targets are unknown in ID, so without a BTB hit they resolve in EX. |
-| **EX** | Compute the actual next pc (P2 §6.3). If it differs from `pred_npc`, that is a **mispredict**: flush `IF/ID` and `ID/EX` and redirect, costing 2 bubbles, exactly as in P2. Update the predictor and BTB in the cycle the branch leaves EX. |
+| **EX** | Resolve taken/not-taken and the target (P2 §6.3). If the taken bit differs from the prediction, or both say taken and the targets differ, that is a **mispredict** (see §9.1: not a next-pc comparison): flush `IF/ID` and `ID/EX` and redirect, costing 2 bubbles, exactly as in P2. Update the predictor and BTB in the cycle the branch leaves EX. |
 
 **Why ID redirect exists:** the prompt makes the BTB optional. Without one, a
 taken prediction cannot be used in IF, because the target isn't known yet.
@@ -335,3 +335,28 @@ None of this is shared with the ISS. The ISS stays untouched.
 | Blocking misses, no DRAM contention | MSHRs, a bus model | An in-order core with blocking caches is the standard baseline. Contention is listed in LIMITATIONS |
 | Retire-slot CPI accounting | Per-stage stall counters | The sum is exact by construction, and each slot has an unambiguous owner. Its bias is documented in §5 |
 | Strict config parser | Accepting unknown keys | A typo can't silently produce a wrong sweep point |
+
+## 9. Clarifications added during implementation
+
+1. **Misprediction is decided by the taken bit, then the target, never by
+   comparing next-pc values** (EX and ID use the same rule). A taken jump to
+   `pc + 4` that was predicted not-taken is a misprediction, exactly as in
+   Phase 2. Found by the Phase 2 regression oracle (`docs/BUGS.md` #4).
+2. **`static_nt` has no ID-stage redirects at all.** That is the Phase 2 front
+   end. Otherwise JAL would cost 1 cycle instead of 2 and the baseline would
+   stop reproducing Phase 2. ID redirect is enabled for `bimodal` and
+   `gshare`. With `static_nt` plus a BTB, ID still corrects BTB predictions
+   (a stale target, or a hit on a non-branch).
+3. **The predictor trains the counter it actually read.** The table index
+   used in IF travels with the instruction to EX and is trained there. For
+   gshare the history may have moved on in between (§2.1), and indexing
+   again at EX would train the wrong counter.
+4. **When EX is held** (by a D-miss stall or a busy MUL/DIV), ID/EX is
+   reloaded with the operand values forwarded that cycle. A producer in
+   MEM/WB can retire during the hold, so the next cycle could no longer
+   forward it, and the value latched in ID would be stale.
+   `P3.OperandHeldInExSurvivesProducerRetiringDuringDMiss` covers this.
+5. **The prediction is read in the cycle the instruction is handed from IF to
+   IF/ID**, not when its I-cache fill completes. Lookups have no side
+   effects, so a fetch that is held simply reads the predictor again, seeing
+   the most recent state.

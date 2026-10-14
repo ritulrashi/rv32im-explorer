@@ -1,7 +1,10 @@
 // rvsim-lockstep: run the golden ISS and the pipeline side by side and stop at
 // the first architectural divergence (contract §8).
 //
-//   rvsim-lockstep PROGRAM [--mul-latency N] [--div-latency N] [--max-cycles N]
+//   rvsim-lockstep PROGRAM [--config FILE] [--set key=value]... [--max-cycles N]
+//
+// The pipeline configuration (predictor, caches, latencies) must never change
+// architectural results, so lockstep must agree under every configuration.
 //
 // Each model gets its OWN memory, loaded from the same ELF. Every time the
 // pipeline retires an instruction, the ISS executes exactly one, and the two
@@ -16,6 +19,7 @@
 #include <array>
 #include <cstdio>
 #include <string>
+#include <vector>
 
 #include "cli_common.h"
 #include "common/decode.h"
@@ -81,20 +85,22 @@ void report_records(const RetireRecord& iss, const RetireRecord& pipe) {
 }  // namespace
 
 int main(int argc, char** argv) {
-  std::string program;
+  std::string program, config_path;
+  std::vector<std::string> overrides;
   pipe::Config cfg;
   uint64_t max_cycles = 100'000'000;
   try {
     for (int k = 1; k < argc; ++k) {
       const std::string a = argv[k];
-      if (a == "--mul-latency") cfg.mul_latency = static_cast<unsigned>(cli::next_num(k, argc, argv));
-      else if (a == "--div-latency") cfg.div_latency = static_cast<unsigned>(cli::next_num(k, argc, argv));
+      if (a == "--config") config_path = cli::next_str(k, argc, argv);
+      else if (a == "--set") overrides.push_back(cli::next_str(k, argc, argv));
       else if (a == "--max-cycles") max_cycles = cli::next_num(k, argc, argv);
       else if (!a.empty() && a[0] == '-') throw std::runtime_error("unknown option " + a);
       else if (program.empty()) program = a;
       else throw std::runtime_error("more than one PROGRAM given");
     }
     if (program.empty()) throw std::runtime_error("no PROGRAM given");
+    cfg = pipe::load_config(config_path, overrides);
   } catch (const std::exception& e) {
     std::fprintf(stderr, "rvsim-lockstep: %s\n", e.what());
     return 6;
