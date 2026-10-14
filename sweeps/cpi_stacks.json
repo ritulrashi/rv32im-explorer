@@ -1,0 +1,19 @@
+{
+  "name": "cpi_stacks",
+  "workloads": [
+    "asm-dot_naive-n1024", "asm-dot_unroll4-n1024",
+    "c-O0-dot_naive-n1024", "c-O0-dot_unroll4-n1024", "c-O3-dot_naive-n1024", "c-O3-dot_unroll4-n1024",
+    "asm-gemm_naive-n32", "asm-gemm_unroll4-n32", "asm-gemm_tiled-n32", "asm-gemm_tiled_unroll4-n32",
+    "c-O0-gemm_naive-n32", "c-O0-gemm_tiled-n32", "c-O0-gemm_unroll4-n32",
+    "c-O3-gemm_naive-n32", "c-O3-gemm_tiled-n32", "c-O3-gemm_unroll4-n32",
+    "c-O3-gemm_naive_pad-n32", "c-O3-gemm_tiled_pad-n32",
+    "asm-gemm_naive-n64", "asm-gemm_unroll4-n64", "asm-gemm_tiled-n64", "asm-gemm_tiled_unroll4-n64",
+    "c-O0-gemm_naive-n64", "c-O0-gemm_tiled-n64", "c-O0-gemm_unroll4-n64",
+    "c-O3-gemm_naive-n64", "c-O3-gemm_tiled-n64", "c-O3-gemm_unroll4-n64",
+    "c-O3-gemm_naive_pad-n64", "c-O3-gemm_tiled_pad-n64"
+  ],
+  "axes": {
+    "config": ["configs/baseline.cfg", "configs/bimodal_btb.cfg", "configs/gshare_btb.cfg",
+               "configs/small_caches.cfg", "configs/big.cfg"]
+  }
+}

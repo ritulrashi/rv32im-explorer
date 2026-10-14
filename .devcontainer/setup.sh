@@ -7,7 +7,8 @@ sudo apt-get update
 sudo apt-get install -y --no-install-recommends \
   build-essential cmake ninja-build clang lld llvm \
   gcc-riscv64-unknown-elf binutils-riscv64-unknown-elf \
-  python3 python3-pip python3-venv \
+  python3 python3-pip python3-venv python3-matplotlib \
+  nodejs \
   verilator \
   git ca-certificates
 git submodule update --init --recursive || true

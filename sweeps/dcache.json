@@ -1,0 +1,9 @@
+{
+  "name": "dcache",
+  "base_config": "configs/small_caches.cfg",
+  "workloads": ["asm-gemm_naive-n64", "asm-gemm_tiled-n64", "c-O3-gemm_tiled_pad-n64", "asm-dot_naive-n1024"],
+  "axes": {
+    "dcache.size_bytes": [256, 512, 1024, 2048, 4096, 8192, 16384],
+    "dcache.assoc": [1, 2, 4, 8]
+  }
+}

@@ -53,3 +53,8 @@ What this project does **not** model or verify. Updated every phase.
 - **Memory contents are not compared:** the three levels are summary, retire trace and per-cycle stage occupancy. A memory-only side effect with no later architectural consequence would go unnoticed (see docs/CORRELATION.md).
 - **The testbench supplies memory read data** computed from flops (docs/phase5-design.md §4). It is not a model of a real SRAM interface.
 - **Same author for the model and the RTL.** A shared misreading of the contract is guarded against by expectations derived by hand from the contract text, not eliminated.
+
+## Sweeps, plots and CI (Phase 6)
+- **Sweeps cover the workloads and parameter ranges in `sweeps/*.json` only.** Kernels with few static branches never stress predictor capacity, so the table-size sweep is flat for them. That's a property of these workloads, not a general result.
+- **Plots are light-mode PNGs, not interactive,** with no dark variant. Each figure's CSV is its table view.
+- **CI runs on GitHub-hosted runners, whose hardware varies between runs.** The GitHub runtime is reported per run, not as a constant. The push job runs the heavy workloads only in the Release build; the ASan build of those runs nightly.

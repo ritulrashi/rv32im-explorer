@@ -1,0 +1,10 @@
+{
+  "name": "smoke",
+  "base_config": "configs/small_caches.cfg",
+  "workloads": ["asm-dot_naive-n1024", "asm-gemm_tiled-n32", "tests/riscv-tests/rv32ui-add"],
+  "axes": {
+    "dcache.size_bytes": [256, 1024],
+    "dcache.assoc": [2, 64],
+    "bpred.type": ["static_nt", "gshare"]
+  }
+}

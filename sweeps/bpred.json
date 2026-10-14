@@ -1,0 +1,12 @@
+{
+  "name": "bpred",
+  "base_config": "configs/baseline.cfg",
+  "workloads": ["asm-dot_naive-n1024", "asm-gemm_naive-n32", "asm-gemm_tiled-n32",
+                "asm-gemm_tiled_unroll4-n32", "c-O0-gemm_naive-n32", "c-O3-gemm_tiled-n32"],
+  "groups": [
+    {"axes": {"bpred.type": ["static_nt"], "btb.entries": [0, 64]}},
+    {"axes": {"bpred.type": ["bimodal"], "bpred.entries": [16, 64, 256, 1024, 4096], "btb.entries": [0, 64]}},
+    {"axes": {"bpred.type": ["gshare"], "bpred.entries": [16, 64, 256, 1024, 4096],
+              "bpred.history_bits": [2, 4], "btb.entries": [0, 64]}}
+  ]
+}

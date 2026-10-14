@@ -1,6 +1,6 @@
 # Phase 6 Design Note: Sweeps, Plots, CI
 
-Status: **awaiting review**
+Status: **approved 2026-10-14 (repository made public for free CI); implemented.**
 
 Goal: turn the model into a tool. That means:
 - sweep configs × workloads in parallel into CSV
@@ -138,3 +138,30 @@ on which runner type you get, so I'll record it.
   plots committed.
 - **CI is green** on the Phase 6 push.
 - **Total regression runtime** is reported both ways (§4), measured.
+
+## 7. Changes during implementation
+
+- **Two spec features:** `"groups"`, a concatenation of products, so that
+  e.g. static_nt is not swept over table sizes it doesn't have, and gshare
+  history is only swept for gshare. And a special `"config"` axis whose values
+  are config files, used by the CPI-stack sweep across the five named
+  machines.
+- **Plots follow the data-viz method:**
+  - **CPI stacks are in cycles per multiply-accumulate, not CPI.** RESULTS.md
+    §6 shows CPI misleads across variants with different instruction counts.
+  - **Colours by job:** nominal series (stack causes, predictor types) use
+    categorical slots in fixed order; associativity, an ordered quantity,
+    uses a one-hue ordinal ramp.
+  - **Palettes checked by the data-viz validator script** (adjacent CVD
+    ΔE ≥ 9.1, normal-vision ≥ 19.6, ordinal ramp monotone). The validator is
+    part of the authoring skill, not the repo, and was run at design time.
+  - **Three slots sit below 3:1 contrast** on the surface, so every figure has
+    a legend, and its CSV is linked as the table view.
+- **Rendering the plots and looking at them found one bug:** the first CPI
+  stack legend omitted `icache` and `dcache`, because it was built from the
+  baseline panel where they are zero. The legend is now built from all six
+  causes.
+- **Overlapping predictor lines** (predictors with identical results) are
+  drawn with nested widths and distinct markers, so none is hidden.
+- **Consistency check:** the `cpi_stacks` sweep reproduces Phase 4's
+  `raw.csv` exactly in every compared counter (150 of 150 rows).

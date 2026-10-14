@@ -1,5 +1,7 @@
 # RV32IM Microarchitecture Explorer
 
+[![regression](https://github.com/ritulrashi/rv32im-explorer/actions/workflows/regression.yml/badge.svg)](https://github.com/ritulrashi/rv32im-explorer/actions/workflows/regression.yml)
+
 A cycle-accurate, parameterizable in-order RISC-V (RV32IM) pipeline model in C++20. It is verified against an independent golden functional simulator and correlated against SystemVerilog RTL.
 
 **Rule for every number in this repo:** it comes from a command you can rerun, recorded next to the commit hash, machine (`lscpu`) and tool versions that produced it. Anything not measured says "not measured".
@@ -13,7 +15,7 @@ A cycle-accurate, parameterizable in-order RISC-V (RV32IM) pipeline model in C++
 | 3 | Branch predictors, caches, DRAM model, config files, CPI stack | **Done.** [results/phase3/](results/phase3/) |
 | 4 | Assembly and clang-compiled workloads, compiler analysis, [RESULTS.md](RESULTS.md) | **Done.** [results/phase4/](results/phase4/) |
 | 5 | SystemVerilog RV32I RTL + Verilator correlation ([CORRELATION.md](docs/CORRELATION.md)) | **Done.** [results/phase5/](results/phase5/) |
-| 6 | Sweep automation, plots, CI | not started |
+| 6 | Parallel sweeps → CSV, plots, GitHub Actions regression | **Done.** [results/phase6/](results/phase6/), [plots](results/phase6/PLOTS.md) |
 
 ## Architecture
 
@@ -106,5 +108,8 @@ Trace format (one line per retired instruction):
 | Phase 4: every workload × every config, tables, investigations, and the check that every number in [RESULTS.md](RESULTS.md) is generated | `scripts/phase4_run.sh` | `results/phase4/` (`tables.md`, `investigations.md`, `raw.csv`, `stats/`, `results_check.txt`) |
 | Phase 5 exit criterion (RTL vs model at three levels on directed + rv32ui + random rv32i programs; lint) | `scripts/phase5_exit.sh` | `results/phase5/exit_criterion.txt`, `programs_*.txt` |
 | Phase 5 sanity check (injected RTL bugs are caught by correlation) | `scripts/phase5_mutation_check.sh` | `results/phase5/mutation_check.txt` |
+| Phase 6: push regression timed locally, the three sweeps (CSV + provenance + commands), plots | `scripts/phase6_exit.sh` | `results/phase6/` (`regression_runtime_codespace.txt`, `sweeps/`, `plots/`, `PLOTS.md`) |
+| Phase 6: GitHub Actions regression wall time for a commit | `scripts/ci_runtime.sh <sha>` | `results/phase6/regression_runtime_github.txt` |
+| Any sweep | `scripts/sweep.py sweeps/<name>.json` | `results/phase6/sweeps/<name>.csv` (+ `.provenance.txt`, `.commands.txt`) |
 
 Every results file starts with the output of `scripts/env_report.sh`: commit, whether the tree was clean, submodule pin, `lscpu`, and tool versions. Run each script on a clean checkout. A script that runs after another has written a results file will correctly report the tree as dirty.

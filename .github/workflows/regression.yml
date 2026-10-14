@@ -1,0 +1,59 @@
+# Full regression on every push and pull request; everything under ASan
+# nightly (docs/phase6-design.md §3). Toolchain installed by the same
+# .devcontainer/setup.sh as the Codespace, so versions match development.
+name: regression
+
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: "17 6 * * *"   # nightly full run
+  workflow_dispatch:
+
+jobs:
+  regression:
+    if: github.event_name == 'push' || github.event_name == 'pull_request'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Install toolchain (same script as the dev container)
+        run: bash .devcontainer/setup.sh
+      - name: Regression (golden ISS, pipeline timing, lockstep, random seeds, CPI sum, Phase 2 regression, workloads, RTL correlation)
+        run: bash scripts/phase6_regression.sh
+      - name: Timing summary
+        if: always()
+        run: cat build/logs/regression_runtime.txt >> "$GITHUB_STEP_SUMMARY" || true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: regression-logs
+          path: |
+            build/logs/
+            build/asan/Testing/Temporary/LastTest.log
+            build/release/Testing/Temporary/LastTest.log
+          if-no-files-found: ignore
+
+  full:
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Install toolchain
+        run: bash .devcontainer/setup.sh
+      - name: Full regression under ASan (including workloads)
+        run: bash scripts/phase6_regression.sh --full
+      - name: Timing summary
+        if: always()
+        run: cat build/logs/regression_runtime.txt >> "$GITHUB_STEP_SUMMARY" || true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: full-regression-logs
+          path: build/logs/
+          if-no-files-found: ignore

@@ -180,6 +180,14 @@ add_test(NAME rvgen-rv32i-determinism
          COMMAND sh -c "$<TARGET_FILE:rvgen> --seed 7 --isa rv32i > ${CMAKE_CURRENT_BINARY_DIR}/i1.S && $<TARGET_FILE:rvgen> --seed 7 --isa rv32i > ${CMAKE_CURRENT_BINARY_DIR}/i2.S && cmp ${CMAKE_CURRENT_BINARY_DIR}/i1.S ${CMAKE_CURRENT_BINARY_DIR}/i2.S && ! grep -qE '^ +(mul|div|rem)' ${CMAKE_CURRENT_BINARY_DIR}/i1.S")
 set_tests_properties(rvgen-rv32i-determinism PROPERTIES LABELS determinism)
 
+# Phase 6: sweep tooling. The selftest checks spec expansion; the determinism
+# test runs a small sweep with 1 and 4 workers and requires identical CSVs.
+find_package(Python3 COMPONENTS Interpreter REQUIRED)
+add_test(NAME sweep-selftest COMMAND ${Python3_EXECUTABLE} ${PROJECT_SOURCE_DIR}/scripts/sweep.py --selftest)
+add_test(NAME sweep-determinism
+         COMMAND sh -c "cd ${PROJECT_SOURCE_DIR} && ${Python3_EXECUTABLE} scripts/sweep.py sweeps/smoke.json --build ${CMAKE_BINARY_DIR} --out ${CMAKE_CURRENT_BINARY_DIR}/sweep-w1 --workers 1 && ${Python3_EXECUTABLE} scripts/sweep.py sweeps/smoke.json --build ${CMAKE_BINARY_DIR} --out ${CMAKE_CURRENT_BINARY_DIR}/sweep-w4 --workers 4 && cmp ${CMAKE_CURRENT_BINARY_DIR}/sweep-w1/smoke.csv ${CMAKE_CURRENT_BINARY_DIR}/sweep-w4/smoke.csv")
+set_tests_properties(sweep-selftest sweep-determinism PROPERTIES LABELS sweep)
+
 # rvgen determinism: the same seed must give byte-identical assembly.
 add_test(NAME rvgen-determinism
          COMMAND sh -c "$<TARGET_FILE:rvgen> --seed 12345 > ${CMAKE_CURRENT_BINARY_DIR}/g1.S && $<TARGET_FILE:rvgen> --seed 12345 > ${CMAKE_CURRENT_BINARY_DIR}/g2.S && cmp ${CMAKE_CURRENT_BINARY_DIR}/g1.S ${CMAKE_CURRENT_BINARY_DIR}/g2.S")
