@@ -27,6 +27,8 @@ def main():
     # Links like [contract §6.4](docs/...) and "(§5.1, §5.2)" are references,
     # not measurements: drop every "§n.n" before scanning.
     text = re.sub(r"§\d+(?:\.\d+)*", "", text)
+    # Section numbers in Markdown headings ("### 5.2 The fix") likewise.
+    text = re.sub(r"(?m)^(#+\s+)\d+(?:\.\d+)*", r"\1", text)
     corpus = ""
     for g in gens:
         with open(g, encoding="utf-8") as f:
