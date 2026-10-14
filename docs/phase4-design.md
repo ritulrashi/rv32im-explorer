@@ -1,6 +1,6 @@
 # Phase 4 Design Note: Workloads, Compiler Analysis, RESULTS.md
 
-Status: **awaiting review**
+Status: **approved 2026-10-13; implemented. Additions during implementation in §7.**
 
 Goal: run real kernels on the Phase 3 model, then explain *why* each variant
 performs as it does, using the CPI stack, not just raw cycle counts. Every
@@ -176,3 +176,17 @@ least one negative or surprising result investigated.
 - **Kernels are not a benchmark suite.** They are small integer kernels on a
   scalar core. The conclusions are about this microarchitecture and these
   loops, and RESULTS.md will say so.
+
+## 7. Additions during implementation
+
+- **Padded-layout variants** (`c-O3-gemm_naive_pad`, `c-O3-gemm_tiled_pad`, row
+  stride N+4 words). Hypothesis 5 materialised, and §4 promised a padded
+  variant if it did.
+- **`scripts/phase4_investigations.py`:** scripted experiments for each
+  surprising result (full associativity, padding, predictor pathology, code
+  identity), with every simulator command line recorded.
+- **`scripts/check_results_numbers.py`:** checks that every measurement-like
+  number in RESULTS.md (thousands-separated integers and decimals) appears
+  verbatim in a generated results file. Rule 1, enforced mechanically.
+- **`--pc-profile` and retired load/store counters,** used to identify hot
+  loops and compute memory operations per MAC.

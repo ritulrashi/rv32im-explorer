@@ -1,16 +1,20 @@
 // rvsim-pipe: run a program on the cycle-accurate pipeline model.
 //
 //   rvsim-pipe PROGRAM [--config FILE] [--set key=value]... [--max-cycles N]
-//              [--trace FILE|-] [--diagram FILE|-] [--stats FILE|-]
+//              [--trace FILE|-] [--diagram FILE|-] [--stats FILE|-] [--pc-profile FILE|-]
 //
 // Prints a one-line summary on stderr. Exit codes as rvsim-iss.
 // --stats writes JSON: resolved config, cycles, CPI stack, predictor, cache
-// and DRAM counters (docs/phase3-design.md §5).
+// and DRAM counters (docs/phase3-design.md §5), plus a "roi" block when the
+// program marks a region of interest via the `rvx_roi` symbol (phase 4).
+// --pc-profile writes "pc count" lines: how often each pc retired inside the
+// ROI (or the whole run if there is no ROI). Used to find the hot loop.
 // --diagram writes one line per cycle: cycle, then the pc held by each of
 // IF ID EX MEM WB, or "--------" for a bubble (with its cause).
 #include <cstdio>
 #include <fstream>
 #include <iostream>
+#include <map>
 #include <string>
 #include <vector>
 
@@ -38,7 +42,7 @@ std::string stage_cell(const std::optional<uint32_t>& pc, BubbleCause cause) {
 }  // namespace
 
 int main(int argc, char** argv) {
-  std::string program, trace_path, diagram_path, stats_path, config_path;
+  std::string program, trace_path, diagram_path, stats_path, config_path, profile_path;
   std::vector<std::string> overrides;
   Config cfg;
   uint64_t max_cycles = 100'000'000;
@@ -48,6 +52,7 @@ int main(int argc, char** argv) {
       if (a == "--trace") trace_path = cli::next_str(k, argc, argv);
       else if (a == "--diagram") diagram_path = cli::next_str(k, argc, argv);
       else if (a == "--stats") stats_path = cli::next_str(k, argc, argv);
+      else if (a == "--pc-profile") profile_path = cli::next_str(k, argc, argv);
       else if (a == "--config") config_path = cli::next_str(k, argc, argv);
       else if (a == "--set") overrides.push_back(cli::next_str(k, argc, argv));
       else if (a == "--max-cycles") max_cycles = cli::next_num(k, argc, argv);
@@ -78,14 +83,16 @@ int main(int argc, char** argv) {
     if (!f) throw std::runtime_error("cannot open " + path);
     return &f;
   };
-  std::ofstream tf, df, sf;
+  std::ofstream tf, df, sf, pf;
   std::ostream* trace_os = nullptr;
   std::ostream* diag_os = nullptr;
   std::ostream* stats_os = nullptr;
+  std::ostream* profile_os = nullptr;
   try {
     trace_os = open(trace_path, tf);
     diag_os = open(diagram_path, df);
     stats_os = open(stats_path, sf);
+    profile_os = open(profile_path, pf);
   } catch (const std::exception& e) {
     std::fprintf(stderr, "rvsim-pipe: %s\n", e.what());
     return 6;
@@ -93,6 +100,10 @@ int main(int argc, char** argv) {
 
   Pipeline p(mem, loaded.entry, cfg);
   p.set_tohost(loaded.symbol("tohost"));
+  const auto roi_marker = loaded.symbol("rvx_roi");
+  p.set_roi_marker(roi_marker);
+  std::map<uint32_t, uint64_t> profile;  // ordered: deterministic output
+  int roi_state = roi_marker ? 0 : 1;      // 0 before, 1 inside, 2 after
   if (diag_os) *diag_os << "cycle    IF       ID       EX       MEM      WB\n";
   try {
     while (!p.halted()) {
@@ -102,6 +113,14 @@ int main(int argc, char** argv) {
       }
       auto rec = p.tick();
       if (trace_os && rec) *trace_os << format_retire(*rec) << '\n';
+      if (rec && profile_os) {
+        if (roi_marker && rec->mem == MemKind::Write && rec->mem_addr == *roi_marker) {
+          if (rec->mem_data == 1 && roi_state == 0) roi_state = 1;
+          else if (rec->mem_data == 2 && roi_state == 1) roi_state = 2;
+        } else if (roi_state == 1) {
+          ++profile[rec->pc];
+        }
+      }
       if (diag_os) {
         const auto& v = p.last_view();
         char c[24];
@@ -125,6 +144,9 @@ int main(int argc, char** argv) {
                static_cast<unsigned long long>(p.cycles()), h.pc);
   if (h.reason == HaltReason::ToHost) std::fprintf(stderr, " tohost=0x%08x", h.tohost_value);
   if (stats_os) *stats_os << stats_json(p, program);
+  if (profile_os) {
+    for (const auto& [pc, n] : profile) *profile_os << std::hex << pc << std::dec << ' ' << n << '\n';
+  }
   std::fprintf(stderr, "\n");
   return code;
 }

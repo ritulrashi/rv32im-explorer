@@ -115,6 +115,7 @@ std::optional<RetireRecord> Pipeline::tick() {
   uint8_t wb_rd = 0;
   uint32_t wb_val = 0;
   std::optional<HaltInfo> halting;
+  std::optional<uint32_t> roi_event;  // value stored to the ROI marker this cycle
 
   if (mem_wb_.valid) {
     if (mem_wb_.exc != HaltReason::None) {
@@ -138,6 +139,11 @@ std::optional<RetireRecord> Pipeline::tick() {
         r.mem_size = mem_wb_.mem_size;
       }
       retired = r;
+      if (r.mem == MemKind::Read) ++stats_.loads;
+      if (r.mem == MemKind::Write) ++stats_.stores;
+      if (r.mem == MemKind::Write && roi_marker_ && r.mem_addr == *roi_marker_) {
+        roi_event = r.mem_data;  // snapshot taken at the end of this cycle
+      }
       if (r.mem == MemKind::Write && tohost_ && r.mem_addr == *tohost_) {
         halting = HaltInfo{HaltReason::ToHost, mem_wb_.pc + 4, r.mem_data};  // P2 §7
       }
@@ -533,10 +539,24 @@ std::optional<RetireRecord> Pipeline::tick() {
   // =========================================================================
   if (wb_write) regs_[wb_rd] = wb_val;
   if (retired) ++retired_;
+  // Region-of-interest snapshot, after every counter update of this cycle.
+  // The cycle in which the begin marker retires is outside the ROI; the cycle
+  // in which the end marker retires is inside it.
+  auto record_roi = [&] {
+    if (!roi_event) return;
+    if (*roi_event == 1 && !roi_.begun) {
+      roi_.begun = true;
+      roi_.begin = snapshot();
+    } else if (*roi_event == 2 && roi_.begun && !roi_.ended) {
+      roi_.ended = true;
+      roi_.end = snapshot();
+    }
+  };
   if (halting) {
     if (stats_.cpi_total() != cycle_) {
       throw std::logic_error("CPI stack does not sum to total cycles");
     }
+    record_roi();
     halt_ = *halting;
     return retired;
   }
@@ -575,7 +595,44 @@ std::optional<RetireRecord> Pipeline::tick() {
   md_b_ = n_md_b;
   mem_wait_ = n_mem_wait;
   mem_accessed_ = n_mem_accessed;
+  record_roi();
   return retired;
+}
+
+CounterSnapshot Pipeline::snapshot() const {
+  CounterSnapshot s;
+  s.cycles = cycle_;
+  s.retired = retired_;
+  s.pipe = stats_;
+  if (memsys_.icache()) s.icache = memsys_.icache()->stats();
+  if (memsys_.dcache()) s.dcache = memsys_.dcache()->stats();
+  s.dram = memsys_.dram().stats();
+  return s;
+}
+
+CounterSnapshot operator-(const CounterSnapshot& a, const CounterSnapshot& b) {
+  CounterSnapshot d;
+  d.cycles = a.cycles - b.cycles;
+  d.retired = a.retired - b.retired;
+  for (size_t k = 0; k < kCpiCats; ++k) d.pipe.cpi[k] = a.pipe.cpi[k] - b.pipe.cpi[k];
+  d.pipe.branch_mispredict_cycles = a.pipe.branch_mispredict_cycles - b.pipe.branch_mispredict_cycles;
+  d.pipe.branch_id_redirect_cycles = a.pipe.branch_id_redirect_cycles - b.pipe.branch_id_redirect_cycles;
+  d.pipe.branch_fence_i_cycles = a.pipe.branch_fence_i_cycles - b.pipe.branch_fence_i_cycles;
+  d.pipe.cond_branches = a.pipe.cond_branches - b.pipe.cond_branches;
+  d.pipe.cond_mispredicts = a.pipe.cond_mispredicts - b.pipe.cond_mispredicts;
+  d.pipe.jumps = a.pipe.jumps - b.pipe.jumps;
+  d.pipe.jump_mispredicts = a.pipe.jump_mispredicts - b.pipe.jump_mispredicts;
+  d.pipe.btb_hits = a.pipe.btb_hits - b.pipe.btb_hits;
+  d.pipe.id_redirects = a.pipe.id_redirects - b.pipe.id_redirects;
+  d.pipe.loads = a.pipe.loads - b.pipe.loads;
+  d.pipe.stores = a.pipe.stores - b.pipe.stores;
+  d.icache = {a.icache.accesses - b.icache.accesses, a.icache.misses - b.icache.misses,
+              a.icache.writebacks - b.icache.writebacks};
+  d.dcache = {a.dcache.accesses - b.dcache.accesses, a.dcache.misses - b.dcache.misses,
+              a.dcache.writebacks - b.dcache.writebacks};
+  d.dram = {a.dram.row_hits - b.dram.row_hits, a.dram.row_closed - b.dram.row_closed,
+            a.dram.row_misses - b.dram.row_misses};
+  return d;
 }
 
 std::string Pipeline::describe() const {

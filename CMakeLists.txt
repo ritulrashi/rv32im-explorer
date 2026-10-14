@@ -74,3 +74,6 @@ if(RVX_BUILD_TESTS)
   enable_testing()
   add_subdirectory(tests)
 endif()
+
+# Phase 4 workloads (needs the RISC-V GCC toolchain and clang).
+add_subdirectory(workloads)

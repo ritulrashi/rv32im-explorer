@@ -46,6 +46,8 @@ class Pipeline {
   Pipeline(Memory& mem, uint32_t entry_pc, Config cfg = {});
 
   void set_tohost(std::optional<uint32_t> addr) { tohost_ = addr; }
+  // Address whose stores of 1 / 2 begin / end the region of interest.
+  void set_roi_marker(std::optional<uint32_t> addr) { roi_marker_ = addr; }
 
   // Simulates one clock cycle. Returns the instruction retired in WB this
   // cycle, if any. Does nothing once halted.
@@ -76,6 +78,8 @@ class Pipeline {
   const Config& config() const { return cfg_; }
   const PipeStats& stats() const { return stats_; }
   const cache::MemSystem& mem_system() const { return memsys_; }
+  const RoiStats& roi() const { return roi_; }
+  CounterSnapshot snapshot() const;  // all counters now
 
   // Stage occupancy during the most recent tick() (the cycle just simulated).
   const StageView& last_view() const { return view_; }
@@ -90,6 +94,7 @@ class Pipeline {
   Memory& mem_;
   Config cfg_;
   std::optional<uint32_t> tohost_;
+  std::optional<uint32_t> roi_marker_;
 
   // ---- Timing-only structures (P3 §0.2): never affect values ----
   cache::MemSystem memsys_;
@@ -119,6 +124,7 @@ class Pipeline {
   StageView view_;
   Control last_control_;
   PipeStats stats_;
+  RoiStats roi_;
 };
 
 }  // namespace rvx::pipe

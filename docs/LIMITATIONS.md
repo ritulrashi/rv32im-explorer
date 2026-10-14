@@ -36,3 +36,11 @@ What this project does **not** model or verify. Updated every phase.
 - **`FENCE.I` invalidates the whole I-cache.** Real implementations may invalidate selectively.
 - **Retire-slot CPI accounting:** each cycle is charged to whatever occupies WB. When a flush replaces bubbles that were already in flight (for example, an I-miss bubble replaced by a mispredict bubble), those cycles are charged to the flushing event. The stack answers "what put a bubble in the retire slot", not "every hazard that was pending". Pipeline-fill cycles count as `base`.
 - **The `branch` category includes more than mispredictions:** it also covers ID-redirect bubbles (correctly predicted taken branches without a BTB hit) and `FENCE.I` refetches. The stats JSON breaks these out separately.
+
+## Workloads and RESULTS.md (Phase 4)
+- **Two small integer kernels (dot product, GEMM) on a scalar in-order core.** They are not a benchmark suite. Conclusions are about these loops on this model, not about RISC-V cores in general.
+- **One data seed and fixed sizes** (dot N=1024; GEMM N=32 and 64; tile T=8). Data values do not affect timing (no data-dependent latency in the model), but sizes and alignment do. The effect of array alignment is shown explicitly (padding experiment), not swept.
+- **Arrays are 4 KiB-aligned by construction**, which is the worst case for set conflicts. A real allocator or linker could place them differently.
+- **Cold caches at the start of the region of interest.** The ROI-marker store allocates one D-cache line (on its own line, so it evicts no workload data), and the marker store that ends the ROI is counted inside it.
+- **C kernels are compiled freestanding with `-fno-builtin`**, so clang cannot call `memset`/`memcpy`. One clang version (recorded in provenance); other versions or GCC may generate different code.
+- **No timing noise:** the model is deterministic, so each result is one run. Error bars would be meaningless here. They would matter on hardware.

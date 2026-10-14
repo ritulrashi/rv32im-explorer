@@ -280,6 +280,35 @@ TEST_F(P3, OperandHeldInExSurvivesProducerRetiringDuringDMiss) {
   EXPECT_EQ(p->reg(8), 10u);
 }
 
+TEST_F(P3, RegionOfInterestCountsOnlyTheMarkedCycles) {
+  // docs/phase4-design.md §1.4. ROI marker at 0x7E0.
+  // 0 addi x5, x0, 1
+  // 1 sw   x5, 0x7E0(x0)   ROI begin: retires c6 (outside the ROI)
+  // 2 lw   x1, 0x400(x0)
+  // 3 add  x2, x1, x1      load-use: +1
+  // 4 addi x6, x0, 2
+  // 5 sw   x6, 0x7E0(x0)   ROI end: retires c5 + 5 + 1 = c11 (inside)
+  // 6 END                  total = 7 + 4 + 1 = 12
+  // ROI = cycles 7..11 = 5; retired 4 (instructions 2-5): base 4, load_use 1;
+  // one load, and one store (the end marker itself).
+  prog({enc::addi(5, 0, 1), enc::sw(5, 0, 0x7E0), enc::lw(1, 0, 0x400), enc::add(2, 1, 1),
+        enc::addi(6, 0, 2), enc::sw(6, 0, 0x7E0), END});
+  p = std::make_unique<Pipeline>(mem, 0, cfg);
+  p->set_tohost(kToHost);
+  p->set_roi_marker(0x7E0);
+  p->run(1000);
+  EXPECT_EQ(p->cycles(), 12u);
+  ASSERT_TRUE(p->roi().complete());
+  const auto r = p->roi().delta();
+  EXPECT_EQ(r.cycles, 5u);
+  EXPECT_EQ(r.retired, 4u);
+  EXPECT_EQ(r.pipe[CpiCat::Base], 4u);
+  EXPECT_EQ(r.pipe[CpiCat::LoadUse], 1u);
+  EXPECT_EQ(r.pipe.cpi_total(), r.cycles);
+  EXPECT_EQ(r.pipe.loads, 1u);
+  EXPECT_EQ(r.pipe.stores, 1u);
+}
+
 TEST_F(P3, LoadUseAndMulDivAreAttributed) {
   // lw x1 (data ideal); add x2,x1,x1 (load-use 1); mul x3,x2,x2 (L=3: 2); END
   prog({enc::lw(1, 0, 0x400), enc::add(2, 1, 1), enc::m(0, 3, 2, 2), END});
